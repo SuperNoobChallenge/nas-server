@@ -39,6 +39,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-thymeleaf-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// JSON 처리를 위한 Hypersistence Utils
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-71:3.15.1'
+	// JSON 파싱용 라이브러리
+	implementation 'com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations'
+
 }
 
 tasks.named('test') {

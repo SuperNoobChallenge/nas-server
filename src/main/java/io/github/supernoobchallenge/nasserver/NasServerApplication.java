@@ -9,8 +9,7 @@ import org.springframework.context.annotation.Import;
 @Import(SecurityConfig.class)
 public class NasServerApplication {
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		SpringApplication.run(NasServerApplication.class, args);
 	}
-
 }
