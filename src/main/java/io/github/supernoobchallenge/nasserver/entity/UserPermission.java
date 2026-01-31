@@ -2,6 +2,7 @@ package io.github.supernoobchallenge.nasserver.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,13 @@ public class UserPermission extends AuditEntity{
 
     @Column(nullable = false)
     private boolean canCreateGroup;
+
+    @Builder
+    public UserPermission(User user, boolean canInvitePerson, boolean canShareFile, boolean canStorePersonal, boolean canCreateGroup) {
+        this.user = user;
+        this.canInvitePerson = canInvitePerson;
+        this.canShareFile = canShareFile;
+        this.canStorePersonal = canStorePersonal;
+        this.canCreateGroup = canCreateGroup;
+    }
 }

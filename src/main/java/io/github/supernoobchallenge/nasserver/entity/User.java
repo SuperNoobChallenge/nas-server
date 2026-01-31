@@ -2,6 +2,7 @@ package io.github.supernoobchallenge.nasserver.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,4 +39,50 @@ public class User extends BaseEntity {
     // 1:1 관계 매핑
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserPermission userPermission;
+
+    @Builder
+    public User(String loginId, String password, String email, FilePermissionKey filePermission, User inviter) {
+        this.loginId = loginId;
+        this.password = password;
+        this.email = email;
+        this.filePermission = filePermission;
+        this.inviter = inviter;
+    }
+
+    // ==========================================
+    // 비즈니스 로직 메서드
+    // ==========================================
+
+    /**
+     * 비밀번호 변경
+     * @param newPassword 암호화된 새 비밀번호
+     */
+    public void changePassword(String newPassword) {
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new IllegalArgumentException("새 비밀번호는 비어있을 수 없습니다.");
+        }
+
+        if (this.password.equals(newPassword)) {
+            throw new IllegalArgumentException("기존 비밀번호와 동일합니다.");
+        }
+
+        this.password = newPassword;
+    }
+
+    /**
+     * 이메일 변경
+     * @param newEmail 새 이메일 주소
+     */
+    public void updateEmail(String newEmail) {
+        if (newEmail == null || newEmail.isBlank()) {
+            throw new IllegalArgumentException("이메일 주소는 비어있을 수 없습니다.");
+        }
+
+        this.email = newEmail;
+    }
+
+    // (참고) 기존 setPermission도 이름 변경 추천
+    public void assignPermission(UserPermission userPermission) {
+        this.userPermission = userPermission;
+    }
 }
