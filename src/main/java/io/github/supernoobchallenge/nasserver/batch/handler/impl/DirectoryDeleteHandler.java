@@ -3,9 +3,12 @@ package io.github.supernoobchallenge.nasserver.batch.handler.impl;
 import io.github.supernoobchallenge.nasserver.batch.handler.BatchJobHandler;
 import io.github.supernoobchallenge.nasserver.batch.entity.BatchJobQueue;
 import io.github.supernoobchallenge.nasserver.file.core.repository.VirtualDirectoryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -16,26 +19,30 @@ public class DirectoryDeleteHandler implements BatchJobHandler {
 
     @Override
     public String getJobType() {
-        return "DIRECTORY_DELETE"; // DB에 저장되는 jobType 문자열과 일치해야 함
+        return "DIRECTORY_DELETE";
     }
 
     @Override
-    public void handle(BatchJobQueue job) {
-        // 1. 데이터 꺼내기
-        Long directoryId = job.getTargetId();
-        String reason = (String) job.getJobData().get("reason");
+    @Transactional // JPA 벌크 연산은 트랜잭션 필수
+    public void handle(List<BatchJobQueue> jobs) {
+        if (jobs.isEmpty()) return;
 
-        log.info(">>> [배치 시작] 폴더 삭제 작업. ID: {}, 사유: {}", directoryId, reason);
+        // 1. 요청된 타겟 ID 추출
+        List<Long> rootIds = jobs.stream()
+                .map(BatchJobQueue::getTargetId)
+                .toList();
 
-        // 2. 실제 로직 수행 (가상)
-        // directoryRepository.deleteRecursive(directoryId);
+        // 2. [Native Query] 자손 ID까지 싹 다 긁어오기 (속도 빠름)
+        List<Long> allTargetIds = directoryRepository.findAllDescendantIds(rootIds);
 
-        try {
-            Thread.sleep(2000); // 오래 걸리는 작업 흉내
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (allTargetIds.isEmpty()) {
+            log.info("삭제할 대상 폴더가 없습니다 (이미 삭제되었거나 존재하지 않음).");
+            return;
         }
 
-        log.info(">>> [배치 종료] 폴더 삭제 완료.");
+        // 3. [JPQL] 벌크 업데이트 수행
+        directoryRepository.softDeleteInBatch(allTargetIds);
+
+        log.info(">>> [배치 완료] 요청 루트: {}개 -> 실제 삭제(하위포함): {}개", rootIds.size(), allTargetIds.size());
     }
 }

@@ -1,12 +1,13 @@
 package io.github.supernoobchallenge.nasserver;
 
+import io.github.supernoobchallenge.nasserver.batch.config.BatchSchedulerConfig;
 import io.github.supernoobchallenge.nasserver.global.config.SecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, BatchSchedulerConfig.class})
 public class NasServerApplication {
 
 	static void main(String[] args) {
