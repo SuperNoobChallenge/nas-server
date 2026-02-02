@@ -1,7 +1,8 @@
 package io.github.supernoobchallenge.nasserver.repository;
 
-import io.github.supernoobchallenge.nasserver.config.JpaConfig;
-import io.github.supernoobchallenge.nasserver.entity.FilePermissionKey;
+import io.github.supernoobchallenge.nasserver.file.core.repository.FilePermissionKeyRepository;
+import io.github.supernoobchallenge.nasserver.global.config.JpaConfig;
+import io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import static io.github.supernoobchallenge.nasserver.entity.FilePermissionKey.builder;
+import static io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey.builder;
 
 @SpringBootTest
 @Transactional

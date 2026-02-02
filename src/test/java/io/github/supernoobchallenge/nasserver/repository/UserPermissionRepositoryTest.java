@@ -1,9 +1,12 @@
 package io.github.supernoobchallenge.nasserver.repository;
 
-import io.github.supernoobchallenge.nasserver.config.JpaConfig;
-import io.github.supernoobchallenge.nasserver.entity.FilePermissionKey;
-import io.github.supernoobchallenge.nasserver.entity.User;
-import io.github.supernoobchallenge.nasserver.entity.UserPermission;
+import io.github.supernoobchallenge.nasserver.file.core.repository.FilePermissionKeyRepository;
+import io.github.supernoobchallenge.nasserver.global.config.JpaConfig;
+import io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey;
+import io.github.supernoobchallenge.nasserver.user.entity.User;
+import io.github.supernoobchallenge.nasserver.user.entity.UserPermission;
+import io.github.supernoobchallenge.nasserver.user.repository.UserPermissionRepository;
+import io.github.supernoobchallenge.nasserver.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -12,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import static io.github.supernoobchallenge.nasserver.entity.FilePermissionKey.OwnerType.USER;
+import static io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey.OwnerType.USER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
 @Import(JpaConfig.class)

@@ -1,7 +1,7 @@
 package io.github.supernoobchallenge.nasserver.batch.service;
 
-import io.github.supernoobchallenge.nasserver.entity.BatchJobQueue;
-import io.github.supernoobchallenge.nasserver.repository.BatchJobQueueRepository;
+import io.github.supernoobchallenge.nasserver.batch.entity.BatchJobQueue;
+import io.github.supernoobchallenge.nasserver.batch.repository.BatchJobQueueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

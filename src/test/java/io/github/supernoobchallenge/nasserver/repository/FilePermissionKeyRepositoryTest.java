@@ -1,7 +1,8 @@
 package io.github.supernoobchallenge.nasserver.repository;
 
-import io.github.supernoobchallenge.nasserver.config.JpaConfig;
-import io.github.supernoobchallenge.nasserver.entity.FilePermissionKey;
+import io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey;
+import io.github.supernoobchallenge.nasserver.file.core.repository.FilePermissionKeyRepository;
+import io.github.supernoobchallenge.nasserver.global.config.JpaConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 
-import static io.github.supernoobchallenge.nasserver.entity.FilePermissionKey.*;
+import static io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey.*;
+import static io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey.OwnerType.*;
 import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 @Transactional
@@ -25,7 +27,7 @@ class FilePermissionKeyRepositoryTest {
     public void insertTest() throws Exception{
         FilePermissionKey key = builder()
                 .parentPermission(null)
-                .ownerType(OwnerType.USER).build();
+                .ownerType(USER).build();
         repository.save(key);
         FilePermissionKey key1 = repository.findById(key.getId()).get();
         assertThat(key1).isEqualTo(key);
@@ -36,7 +38,7 @@ class FilePermissionKeyRepositoryTest {
         // give
         FilePermissionKey key = builder()
                 .parentPermission(null)
-                .ownerType(OwnerType.USER).build();
+                .ownerType(USER).build();
         repository.save(key);
 
         //when
@@ -46,7 +48,7 @@ class FilePermissionKeyRepositoryTest {
         // than
         FilePermissionKey key1 = repository.findById(key.getId()).get();
         assertThat(key1.getParentPermission()).isNull();
-        assertThat(key1.getOwnerType()).isEqualTo(OwnerType.USER);
+        assertThat(key1.getOwnerType()).isEqualTo(USER);
         assertThat(key1.getTotalCapacity()).isEqualTo(0);
         assertThat(key1.getAvailableCapacity()).isEqualTo(0);
         assertThat(key1.getDeletedAt()).isNull();
@@ -60,11 +62,11 @@ class FilePermissionKeyRepositoryTest {
         // give
         FilePermissionKey parent = builder()
                 .parentPermission(null)
-                .ownerType(OwnerType.USER).build();
+                .ownerType(USER).build();
         repository.save(parent);
         FilePermissionKey child = builder()
                 .parentPermission(parent)
-                .ownerType(OwnerType.USER).build();
+                .ownerType(USER).build();
         repository.save(child);
 
         // when
@@ -81,7 +83,7 @@ class FilePermissionKeyRepositoryTest {
         // give
         FilePermissionKey key = builder()
                 .parentPermission(null)
-                .ownerType(OwnerType.USER).build();
+                .ownerType(USER).build();
         repository.save(key);
         key.delete();
 

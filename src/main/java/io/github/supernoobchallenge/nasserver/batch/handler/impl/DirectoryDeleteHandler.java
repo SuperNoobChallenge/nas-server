@@ -1,7 +1,8 @@
 package io.github.supernoobchallenge.nasserver.batch.handler.impl;
 
 import io.github.supernoobchallenge.nasserver.batch.handler.BatchJobHandler;
-import io.github.supernoobchallenge.nasserver.entity.BatchJobQueue;
+import io.github.supernoobchallenge.nasserver.batch.entity.BatchJobQueue;
+import io.github.supernoobchallenge.nasserver.file.core.repository.VirtualDirectoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DirectoryDeleteHandler implements BatchJobHandler {
-// 필요한 리포지토리나 서비스 주입
-    // private final VirtualDirectoryRepository directoryRepository;
+
+    private final VirtualDirectoryRepository directoryRepository;
 
     @Override
     public String getJobType() {

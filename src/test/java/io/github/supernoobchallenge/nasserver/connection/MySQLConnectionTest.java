@@ -1,9 +1,9 @@
 package io.github.supernoobchallenge.nasserver.connection;
 
-import io.github.supernoobchallenge.nasserver.config.JpaConfig;
-import io.github.supernoobchallenge.nasserver.entity.FilePermissionKey;
-import io.github.supernoobchallenge.nasserver.entity.User;
-import io.github.supernoobchallenge.nasserver.entity.UserPermission;
+import io.github.supernoobchallenge.nasserver.global.config.JpaConfig;
+import io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey;
+import io.github.supernoobchallenge.nasserver.user.entity.User;
+import io.github.supernoobchallenge.nasserver.user.entity.UserPermission;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;

@@ -1,6 +1,6 @@
 package io.github.supernoobchallenge.nasserver.batch.handler;
 
-import io.github.supernoobchallenge.nasserver.entity.BatchJobQueue;
+import io.github.supernoobchallenge.nasserver.batch.entity.BatchJobQueue;
 
 public interface BatchJobHandler {
     /**
