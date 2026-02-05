@@ -32,7 +32,7 @@ public class DirectoryDeleteHandler implements BatchJobHandler {
                 .map(BatchJobQueue::getTargetId)
                 .toList();
 
-        // 2. [Native Query] 자손 ID까지 싹 다 긁어오기 (속도 빠름)
+        // 2. 자손 ID까지 싹 다 긁어오기 (속도 빠름)
         List<Long> allTargetIds = directoryRepository.findAllDescendantIds(rootIds);
 
         if (allTargetIds.isEmpty()) {
