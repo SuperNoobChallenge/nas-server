@@ -31,7 +31,15 @@ public class BatchJobWorker {
     @PostConstruct
     public void init() {
         handlerMap = batchJobHandlers.stream()
-                .collect(Collectors.toMap(BatchJobHandler::getJobType, Function.identity()));
+                .collect(Collectors.toMap(
+                        BatchJobHandler::getJobType,
+                        Function.identity(),
+                        (existing, duplicate) -> {
+                            throw new IllegalStateException(
+                                    "Duplicate BatchJobHandler for jobType: " + existing.getJobType()
+                            );
+                        }
+                ));
     }
 
     // [스케줄링] 1초마다 실행
@@ -41,7 +49,7 @@ public class BatchJobWorker {
         // 1. [Polling] 대기/재시도 상태 중 실행 가능한 작업 선별
         LocalDateTime now = LocalDateTime.now();
         List<BatchJobQueue> candidates = batchJobQueueRepository
-                .findTop200ByStatusInOrderByBatchJobQueueIdAsc(List.of("wait", "retry_wait"));
+                .findTop200ByStatusInOrderByIdAsc(List.of("wait", "retry_wait"));
 
         List<BatchJobQueue> jobs = candidates.stream()
                 .filter(job -> job.isRunnableAt(now))
@@ -64,7 +72,7 @@ public class BatchJobWorker {
         }
 
         // 2-1. 실제로 PROCESSING으로 바뀐 작업만 다시 조회
-        List<BatchJobQueue> processingJobs = batchJobQueueRepository.findByBatchJobQueueIdInAndStatus(allIds, "in_progress");
+        List<BatchJobQueue> processingJobs = batchJobQueueRepository.findByIdInAndStatus(allIds, "in_progress");
 
         if (processingJobs.isEmpty()) {
             log.info(">>> [BatchWorker] 처리 가능한 작업이 없습니다. 이번 사이클은 종료합니다.");

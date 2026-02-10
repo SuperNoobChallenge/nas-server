@@ -15,13 +15,13 @@ public interface BatchJobQueueRepository extends JpaRepository<BatchJobQueue, Lo
      * 대기 중인 작업 N개 조회 (오래된 순)
      * Limit 기능은 메서드 이름(Top)으로 해결됨
      */
-    List<BatchJobQueue> findTop100ByStatusOrderByBatchJobQueueIdAsc(String status);
+    List<BatchJobQueue> findTop100ByStatusOrderByIdAsc(String status);
 
     /**
      * 대기/재시도 상태의 작업 N개 조회 (오래된 순)
      * 재시도 대상 선별은 워커에서 수행
      */
-    List<BatchJobQueue> findTop200ByStatusInOrderByBatchJobQueueIdAsc(List<String> statuses);
+    List<BatchJobQueue> findTop200ByStatusInOrderByIdAsc(List<String> statuses);
 
     /**
      * 가져온 작업들을 "처리 중"으로 한 방에 변경
@@ -35,7 +35,7 @@ public interface BatchJobQueueRepository extends JpaRepository<BatchJobQueue, Lo
     /**
      * 처리 중인 작업만 다시 조회 (동시성 제어용)
      */
-    List<BatchJobQueue> findByBatchJobQueueIdInAndStatus(List<Long> ids, String status);
+    List<BatchJobQueue> findByIdInAndStatus(List<Long> ids, String status);
 
     /**
      * 성공한 작업들을 "성공"으로 한 방에 변경

@@ -55,16 +55,11 @@ public class BatchJobQueue extends AuditEntity {
     @Column(name = "next_run_at", nullable = false)
     private LocalDateTime nextRunAt;
 
-    @Column(name = "next_run_at", nullable = false)
+    @Column(name = "started_at", nullable = false)
     private LocalDateTime startedAt;
 
-    // DDL에 started_at 컬럼이 없으므로 제거
-    // finished_at은 존재
     @Column(name = "finished_at")
     private LocalDateTime finishedAt;
-
-    // created_at / updated_at / created_by / updated_by 는 AuditEntity에서 매핑한다고 가정
-    // (AuditEntity 컬럼명이 DDL과 다르면 AuditEntity 쪽도 같이 맞춰야 함)
 
     // ==========================================
     // 1. Builder 생성자
