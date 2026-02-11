@@ -29,7 +29,7 @@ public interface BatchJobQueueRepository extends JpaRepository<BatchJobQueue, Lo
      * - 시도 횟수 증가
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE BatchJobQueue b SET b.status = :status, b.attemptCount = b.attemptCount + 1 WHERE b.id IN :ids AND b.status IN ('wait', 'retry_wait')")
+    @Query("UPDATE BatchJobQueue b SET b.status = :status, b.attemptCount = b.attemptCount + 1, b.startedAt = CURRENT_TIMESTAMP WHERE b.id IN :ids AND b.status IN ('wait', 'retry_wait')")
     int updateStatusToProcessing(@Param("ids") List<Long> ids, @Param("status") String status);
 
     /**

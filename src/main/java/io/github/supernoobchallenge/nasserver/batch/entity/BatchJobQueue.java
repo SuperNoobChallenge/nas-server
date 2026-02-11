@@ -55,7 +55,7 @@ public class BatchJobQueue extends AuditEntity {
     @Column(name = "next_run_at", nullable = false)
     private LocalDateTime nextRunAt;
 
-    @Column(name = "started_at", nullable = false)
+    @Column(name = "started_at")
     private LocalDateTime startedAt;
 
     @Column(name = "finished_at")
@@ -82,7 +82,6 @@ public class BatchJobQueue extends AuditEntity {
 
         this.maxAttempts = maxAttempts > 0 ? maxAttempts : 4;
         this.nextRunAt = nextRunAt != null ? nextRunAt : LocalDateTime.now();
-        this.startedAt = LocalDateTime.now();
 
         this.jobData = (jobData != null) ? jobData : new HashMap<>();
     }
