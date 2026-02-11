@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class BatchJobService {
+    private static final int DEFAULT_MAX_ATTEMPTS = 4;
+
     private final BatchJobQueueRepository batchJobQueueRepository;
 
     /**
@@ -32,6 +35,8 @@ public class BatchJobService {
                 .targetTable(targetTable)
                 .targetId(targetId)
                 .jobData(jobData) // 초기 상태
+                .maxAttempts(DEFAULT_MAX_ATTEMPTS)
+                .nextRunAt(LocalDateTime.now())
                 .build();
 
         batchJobQueueRepository.save(job);

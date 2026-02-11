@@ -4,6 +4,7 @@ import io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey
 import io.github.supernoobchallenge.nasserver.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,4 +43,23 @@ public class CapacityAllocation extends BaseEntity {
 
     @Column(length = 100)
     private String description;
+
+    @Builder
+    public CapacityAllocation(
+            CapacityAllocation granterAllocation,
+            FilePermissionKey receiverPermission,
+            FilePermissionKey giverPermission,
+            Long allocatedSize,
+            LocalDateTime expirationDate,
+            String allocationType,
+            String description
+    ) {
+        this.granterAllocation = granterAllocation;
+        this.receiverPermission = receiverPermission;
+        this.giverPermission = giverPermission;
+        this.allocatedSize = allocatedSize;
+        this.expirationDate = expirationDate;
+        this.allocationType = allocationType;
+        this.description = description;
+    }
 }

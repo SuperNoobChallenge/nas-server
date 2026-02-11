@@ -42,6 +42,38 @@ public class FilePermissionKey extends BaseEntity {
         this.availableCapacity = 0L;
     }
 
+    /**
+     * 배치 핸들러에서 사용하는 "용량 부여" 반영 메서드.
+     * 총 용량/가용 용량을 동일하게 증가시킨다.
+     */
+    public void grantCapacity(long amount) {
+        validatePositiveAmount(amount);
+        this.totalCapacity += amount;
+        this.availableCapacity += amount;
+    }
+
+    /**
+     * 배치 핸들러에서 사용하는 "용량 회수" 반영 메서드.
+     * 총 용량/가용 용량을 동일하게 감소시킨다.
+     */
+    public void revokeCapacity(long amount) {
+        validatePositiveAmount(amount);
+        long newTotal = this.totalCapacity - amount;
+        long newAvailable = this.availableCapacity - amount;
+
+        if (newTotal < 0) {
+            throw new IllegalArgumentException("총 용량은 0보다 작을 수 없습니다.");
+        }
+        if (newAvailable < 0) {
+            throw new IllegalArgumentException(
+                    String.format("회수 가능한 가용 용량이 부족합니다. 현재: %d, 회수: %d", this.availableCapacity, amount)
+            );
+        }
+
+        this.totalCapacity = newTotal;
+        this.availableCapacity = newAvailable;
+    }
+
     // ==========================================
     // 비즈니스 로직 메서드
     // ==========================================
@@ -52,17 +84,16 @@ public class FilePermissionKey extends BaseEntity {
      * 강제성을 지니는 이벤트이므로 사용 가능한 용량은 0 이하로 내려가도 상관없음
      */
     public void adjustTotalCapacity(Long amount) {
-        long newTotal = this.totalCapacity + amount;
-
-        // 총 용량 유효성 검사
-        if (newTotal < 0) {
-            throw new IllegalArgumentException("총 용량은 0보다 작을 수 없습니다.");
+        if (amount == null || amount == 0L) {
+            return;
         }
 
-        // 3. 값 반영
-        // Total이 늘어나면 Available도 늘어나고, Total이 줄면 Available도 줄어듦
-        this.totalCapacity = newTotal;
-        this.availableCapacity += amount;
+        if (amount > 0L) {
+            grantCapacity(amount);
+            return;
+        }
+
+        revokeCapacity(Math.abs(amount));
     }
 
     /**
@@ -87,5 +118,11 @@ public class FilePermissionKey extends BaseEntity {
         }
 
         this.availableCapacity = newAvailable;
+    }
+
+    private void validatePositiveAmount(long amount) {
+        if (amount <= 0L) {
+            throw new IllegalArgumentException("용량 변경값은 1 이상이어야 합니다.");
+        }
     }
 }

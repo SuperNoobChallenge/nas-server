@@ -80,8 +80,9 @@ public class BatchJobQueue extends AuditEntity {
         this.status = "wait";
         this.attemptCount = 0;
 
-        this.maxAttempts = maxAttempts;
-        this.nextRunAt = nextRunAt;
+        this.maxAttempts = maxAttempts > 0 ? maxAttempts : 4;
+        this.nextRunAt = nextRunAt != null ? nextRunAt : LocalDateTime.now();
+        this.startedAt = LocalDateTime.now();
 
         this.jobData = (jobData != null) ? jobData : new HashMap<>();
     }

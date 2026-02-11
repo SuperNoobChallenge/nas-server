@@ -52,8 +52,8 @@ class FilePermissionKeyRepositoryTest {
         assertThat(key1.getTotalCapacity()).isEqualTo(0);
         assertThat(key1.getAvailableCapacity()).isEqualTo(0);
         assertThat(key1.getDeletedAt()).isNull();
-        assertThat(key1.getCreatedBy()).isEqualTo(0);
-        assertThat(key1.getUpdatedBy()).isEqualTo(0);
+        assertThat(key1.getCreatedBy()).isEqualTo(1);
+        assertThat(key1.getUpdatedBy()).isEqualTo(1);
     }
     
     @Test
