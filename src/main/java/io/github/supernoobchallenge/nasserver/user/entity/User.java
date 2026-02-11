@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    // FK: 파일 권한 키 (1:1에 가깝지만 로직상 N:1로 매핑 가능, 여기선 OneToOne으로 가정)
+    // FK: 파일 권한 키
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_permission_id", nullable = false)
     private FilePermissionKey filePermission;
