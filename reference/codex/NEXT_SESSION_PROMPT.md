@@ -1,39 +1,43 @@
 # NEXT_SESSION_PROMPT
 
-아래 지시를 그대로 따르며 작업을 이어가라.
-
 ## Role
-너는 이 프로젝트의 유지보수/기능 확장을 담당하는 Codex다.
-프로젝트 루트는 `C:\GitFile\nas-server`다.
+너는 `C:\GitFile\nas-server` 유지보수/기능 확장을 담당하는 Codex다.
+
+## Current Snapshot (Latest Only)
+- 가입 공개 경로는 `POST /api/users/invite-register`만 허용된다.
+- `POST /api/share-links/invites`는 로그인 사용자만 가능하며 inviter는 세션 사용자 ID 기반이다.
+- Spring Security 공개 경계:
+  - `POST /api/auth/login`
+  - `POST /api/users/invite-register`
+  - `POST /api/users/password-reset/request`
+  - `POST /api/users/password-reset/confirm`
+- 그 외 API는 인증 필요.
+- 서비스 관련 클래스/인터페이스 파일명은 `*Service` 규칙을 따른다.
+- 엔티티 `@Id` 필드 변수명은 모두 `id`로 통일되어 있다.
+- 배치 관련 최근 이슈 정리:
+  - 워커 폴링 쿼리 수정은 원인 해결(root-cause fix)
+  - 용량 워커 통합테스트의 `nextRunAt` 강제 과거 설정은 테스트 안정화(hardening)
 
 ## First Steps
-1. `reference/codex/PROJECT_HANDOFF.md`와 `reference/codex/SESSION_BRIEF.md`를 먼저 읽어 현재 상태를 파악한다.
-2. 최근 변경 코드의 핵심 파일을 확인한다:
-   - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/UserService.java`
+1. `reference/codex/SESSION_BRIEF.md`, `reference/codex/PROJECT_HANDOFF.md`, `reference/codex/SESSION_LOG_SHORT.md` 순서로 읽는다.
+2. 아래 핵심 파일을 확인한다:
+   - `src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java`
    - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/AuthService.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/AuthController.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/batch/repository/BatchJobQueueRepository.java`
-3. 테스트를 먼저 한 번 돌려 기준선 상태를 확인한다.
+   - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/UserController.java`
+   - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/PasswordResetService.java`
+   - `src/main/java/io/github/supernoobchallenge/nasserver/share/controller/ShareInvitationController.java`
+   - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualFileRepository.java`
+   - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/RealFileRepository.java`
+3. 기준선 테스트를 실행한다:
+   - `.\gradlew.bat test --tests "*AuthControllerIntegrationTest" --tests "*UserControllerIntegrationTest" --tests "*ShareInvitationIntegrationTest" --tests "*UserServiceIntegrationTest" --tests "*VirtualFileDeleteHandlerTest" --tests "*VirtualDirectoryDeleteHandlerTest"`
+   - `.\gradlew.bat test --tests "*BatchJobWorkerCapacityIntegrationTest" --tests "*CapacityAllocationBatchIntegrationTest"`
 
-## Current Truths (Do Not Break)
-- 시스템 감사 사용자 ID는 `1`이다.
-- user 생성 시 `UserPermission`은 반드시 함께 생성/연결되어야 한다.
-- 비밀번호는 해시(BCrypt)로 저장되어야 한다.
-- 용량 부여/회수는 배치 큐를 통해서만 반영된다.
-- 배치 started_at은 작업 시작 시점에만 기록된다(초기 wait 상태는 null 가능).
+## Priority
+1. 관리자 복구 기능(부팅 시)
+2. 용량 요청 배치 API 레이어
+3. 배치 상태/타입 enum화 및 네이밍 정합성
+4. 비밀번호 재설정 토큰 전용 테이블 + 실제 메일 발송 어댑터 연결
 
-## Quality Bar
-- 기능 추가 시 단위 테스트 + 가능한 범위의 통합 테스트를 함께 작성한다.
-- DB 스키마/엔티티 불일치가 생기면 원인과 수정 방향을 명확히 남긴다.
-- 기존 동작 회귀를 만들지 않는다.
-
-## Priority Backlog
-1. User 등록/비밀번호 변경 API(controller) 추가 및 검증.
-2. 보안 정책 정교화: 인증 필요한 API와 공개 API 분리.
-3. 이메일 링크 기반 비밀번호 재설정 플로우 구현.
-4. 관리자 복구 기능(부팅 시 플래그 기반) 설계/구현.
-
-## Execution Notes
-- 테스트는 실제 스프링 + DB 검증을 선호한다.
-- 필요 시 `@AutoConfigureTestDatabase(replace = NONE)`를 사용한다.
-- 작업이 끝나면 `reference/codex/SESSION_BRIEF.md`와 `reference/codex/PROJECT_HANDOFF.md`를 갱신한다.
+## Rule
+- 작업 종료 시 `SESSION_BRIEF.md`, `PROJECT_HANDOFF.md`, `SESSION_LOG_SHORT.md`를 최신 사실로 즉시 갱신한다.
+- 스냅샷/우선순위가 바뀌면 `NEXT_SESSION_PROMPT.md`도 함께 갱신한다.

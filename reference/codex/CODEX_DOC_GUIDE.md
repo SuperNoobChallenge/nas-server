@@ -19,6 +19,18 @@ Audience: LLM/Codex only.
   - 다음 Codex가 바로 실행할 수 있는 작업 프롬프트
 - `CODEX_DOC_GUIDE.md` (this file)
   - 문서 자체의 관리 규칙
+- `FILE_STRUCTURE_STANDARD.md`
+  - 파일/패키지 배치 표준
+- `COMPONENT_EXAMPLES.md`
+  - controller/service/repository/test 최소 예시
+- `CODING_RULES.md`
+  - 구현/테스트/문서 작성 규칙
+- `NAMING_STANDARD.md`
+  - 클래스/메서드/API/테스트 명명 규칙
+- `commonMistakes.md`
+  - AI/Codex 반복 실수 방지 체크리스트
+- `SESSION_LOG_SHORT.md`
+  - 초단기 세션 로그 (한 줄 포맷)
 
 ## 3. Update Timing
 - 아래 이벤트가 발생하면 문서를 업데이트한다.
