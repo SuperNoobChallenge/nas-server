@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class VirtualDirectoryStats extends AuditEntity {
     @Id
     @Column(name = "directory_id")
-    private Long directoryId;
+    private Long id;
 
     @OneToOne
     @MapsId

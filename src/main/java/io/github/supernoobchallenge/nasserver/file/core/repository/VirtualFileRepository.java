@@ -24,26 +24,26 @@ public interface VirtualFileRepository extends JpaRepository<VirtualFile, Long> 
     @Query("""
             UPDATE VirtualFile vf
             SET vf.deletedAt = CURRENT_TIMESTAMP
-            WHERE vf.virtualFileId IN :virtualFileIds
+            WHERE vf.id IN :virtualFileIds
               AND vf.deletedAt IS NULL
             """)
     void softDeleteByVirtualFileIds(@Param("virtualFileIds") List<Long> virtualFileIds);
 
     @Query("""
-            SELECT vf.realFile.realFileId, COUNT(vf)
+            SELECT vf.realFile.id, COUNT(vf)
             FROM VirtualFile vf
-            WHERE vf.virtualFileId IN :virtualFileIds
+            WHERE vf.id IN :virtualFileIds
               AND vf.deletedAt IS NULL
-            GROUP BY vf.realFile.realFileId
+            GROUP BY vf.realFile.id
             """)
     List<Object[]> countActiveByRealFileIds(@Param("virtualFileIds") Collection<Long> virtualFileIds);
 
     @Query("""
-            SELECT vf.realFile.realFileId, COUNT(vf)
+            SELECT vf.realFile.id, COUNT(vf)
             FROM VirtualFile vf
             WHERE vf.directory.id IN :directoryIds
               AND vf.deletedAt IS NULL
-            GROUP BY vf.realFile.realFileId
+            GROUP BY vf.realFile.id
             """)
     List<Object[]> countActiveByDirectoryIds(@Param("directoryIds") Collection<Long> directoryIds);
 }

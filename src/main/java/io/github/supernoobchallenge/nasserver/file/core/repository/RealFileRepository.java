@@ -16,7 +16,7 @@ public interface RealFileRepository extends JpaRepository<RealFile, Long> {
                     WHEN rf.referenceCount >= :decrementBy THEN rf.referenceCount - :decrementBy
                     ELSE 0
                 END
-            WHERE rf.realFileId = :realFileId
+            WHERE rf.id = :realFileId
             """)
     void decrementReferenceCount(@Param("realFileId") Long realFileId, @Param("decrementBy") int decrementBy);
 }
