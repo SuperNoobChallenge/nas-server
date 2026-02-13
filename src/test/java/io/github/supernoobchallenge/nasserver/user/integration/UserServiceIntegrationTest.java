@@ -40,7 +40,7 @@ class UserServiceIntegrationTest {
     @Test
     @DisplayName("회원 가입 시 User, UserPermission, FilePermissionKey가 함께 저장된다")
     void register_PersistsUserWithPermissionAndFilePermissionKey() {
-        Long userId = userService.register("integration_user_1", "plain-1234", "integration1@test.com", null);
+        Long userId = userService.register("integration_user_1", "plain-1234", "integration1@test.com");
 
         User user = userRepository.findById(userId).orElseThrow();
         UserPermission permission = userPermissionRepository.findById(userId).orElseThrow();
@@ -58,7 +58,7 @@ class UserServiceIntegrationTest {
     @Test
     @DisplayName("비밀번호 변경 시 DB에 해시값으로 갱신된다")
     void changePassword_UpdatesHashedPassword() {
-        Long userId = userService.register("integration_user_2", "old-pass", "integration2@test.com", null);
+        Long userId = userService.register("integration_user_2", "old-pass", "integration2@test.com");
 
         userService.changePassword(userId, "old-pass", "new-pass");
 

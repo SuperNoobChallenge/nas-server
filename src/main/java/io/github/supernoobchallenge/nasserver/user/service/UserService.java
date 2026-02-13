@@ -18,7 +18,21 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Long register(String loginId, String rawPassword, String email, Long inviterId) {
+    public Long register(String loginId, String rawPassword, String email) {
+        return registerInternal(loginId, rawPassword, email, null);
+    }
+
+    @Transactional
+    public Long registerInvitedUser(String loginId, String rawPassword, String email, Long inviterId) {
+        if (inviterId == null) {
+            throw new IllegalArgumentException("inviterId는 필수입니다.");
+        }
+        User inviter = userRepository.findById(inviterId)
+                .orElseThrow(() -> new IllegalArgumentException("inviter가 존재하지 않습니다."));
+        return registerInternal(loginId, rawPassword, email, inviter);
+    }
+
+    private Long registerInternal(String loginId, String rawPassword, String email, User inviter) {
         validateRegisterInput(loginId, rawPassword, email);
 
         if (userRepository.existsByLoginId(loginId)) {
@@ -26,12 +40,6 @@ public class UserService {
         }
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
-        }
-
-        User inviter = null;
-        if (inviterId != null) {
-            inviter = userRepository.findById(inviterId)
-                    .orElseThrow(() -> new IllegalArgumentException("inviter가 존재하지 않습니다."));
         }
 
         FilePermissionKey permissionKey = FilePermissionKey.builder()

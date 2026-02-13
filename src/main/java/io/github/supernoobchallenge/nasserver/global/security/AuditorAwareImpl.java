@@ -1,7 +1,12 @@
 package io.github.supernoobchallenge.nasserver.global.security;
 
+import io.github.supernoobchallenge.nasserver.user.service.AuthService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Optional;
 
@@ -15,7 +20,22 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
      * TODO : auditor연동 구현
      */
     public Optional<Long> getCurrentAuditor() {
-        // 인증된 사용자의 식별자(PK)를 꺼내서 반환해야 한다.
-        return Optional.of(SYSTEM_USER_ID);
+        return getAuthenticatedAuditor().or(() -> Optional.of(SYSTEM_USER_ID));
+    }
+
+    public Optional<Long> getAuthenticatedAuditor() {
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        if (attributes instanceof ServletRequestAttributes servletAttributes) {
+            HttpSession session = servletAttributes.getRequest().getSession(false);
+            if (session == null) {
+                return Optional.empty();
+            }
+            Object userId = session.getAttribute(AuthService.SESSION_USER_ID);
+            if (userId instanceof Number number) {
+                return Optional.of(number.longValue());
+            }
+            return Optional.empty();
+        }
+        return Optional.empty();
     }
 }

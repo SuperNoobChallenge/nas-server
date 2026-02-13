@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,13 +37,15 @@ class AuthControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
+        mockMvc = webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
     @DisplayName("로그인 성공 시 세션에 사용자 정보가 저장된다")
     void login_SetsSessionAttributes() throws Exception {
-        userService.register("auth_integration_user", "pass-1234", "auth1@test.com", null);
+        userService.register("auth_integration_user", "pass-1234", "auth1@test.com");
 
         String body = """
                 {"loginId":"auth_integration_user","password":"pass-1234"}
@@ -64,7 +67,7 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("로그아웃 성공 시 세션이 무효화된다")
     void logout_InvalidatesSession() throws Exception {
-        userService.register("auth_integration_user2", "pass-1234", "auth2@test.com", null);
+        userService.register("auth_integration_user2", "pass-1234", "auth2@test.com");
 
         String loginBody = """
                 {"loginId":"auth_integration_user2","password":"pass-1234"}

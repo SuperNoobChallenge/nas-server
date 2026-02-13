@@ -20,7 +20,6 @@ import static io.github.supernoobchallenge.nasserver.file.core.entity.FilePermis
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,7 +44,7 @@ class UserServiceTest {
         when(userRepository.existsByEmail("u1@test.com")).thenReturn(false);
         when(passwordEncoder.encode("raw-pass")).thenReturn("hashed-pass");
 
-        userService.register("user1", "raw-pass", "u1@test.com", null);
+        userService.register("user1", "raw-pass", "u1@test.com");
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
@@ -66,7 +65,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("유저가 유저를 초대해 등록하면 inviter와 parentPermission이 연결된다")
-    void register_WithInviter_SetsInviterAndParentPermission() {
+    void registerInvitedUser_WithInviter_SetsInviterAndParentPermission() {
         FilePermissionKey inviterKey = FilePermissionKey.builder().ownerType(USER).build();
         User inviter = User.builder()
                 .loginId("inviter")
@@ -80,7 +79,7 @@ class UserServiceTest {
         when(userRepository.findById(10L)).thenReturn(Optional.of(inviter));
         when(passwordEncoder.encode("child-pass")).thenReturn("child-hash");
 
-        userService.register("child", "child-pass", "child@test.com", 10L);
+        userService.registerInvitedUser("child", "child-pass", "child@test.com", 10L);
 
         ArgumentCaptor<FilePermissionKey> keyCaptor = ArgumentCaptor.forClass(FilePermissionKey.class);
         verify(filePermissionKeyRepository).save(keyCaptor.capture());
