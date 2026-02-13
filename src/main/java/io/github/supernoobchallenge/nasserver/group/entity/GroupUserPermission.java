@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class GroupUserPermission extends AuditEntity {
     @Id
     @Column(name = "group_user_id")
-    private Long groupUserId;
+    private Long id;
 
     @OneToOne
     @MapsId

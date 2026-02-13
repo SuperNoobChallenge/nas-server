@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class GroupInvite extends AuditEntity {
     @Id
     @Column(name = "share_link_id")
-    private Long shareLinkId;
+    private Long id;
 
     @OneToOne
     @MapsId

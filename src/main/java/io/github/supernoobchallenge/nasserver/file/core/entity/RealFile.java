@@ -14,7 +14,7 @@ public class RealFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "real_file_id")
-    private Long realFileId;
+    private Long id;
 
     @Column(nullable = false, unique = true, length = 32)
     private String storageUuid;
