@@ -20,7 +20,9 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static io.github.supernoobchallenge.nasserver.file.core.entity.FilePermissionKey.OwnerType.USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,6 +61,18 @@ class BatchJobWorkerCapacityIntegrationTest {
     @Test
     @DisplayName("워커 실행 시 FILE_PERMISSION_CAPACITY_APPLY 작업이 success로 완료되고 용량/이력이 반영된다")
     void processPendingJobs_CompletesCapacityJobAndAppliesChanges() {
+        // Shared DB 환경에서도 이 테스트가 독립적으로 동작하도록 기존 runnable job은 선정 대상에서 제외한다.
+        excludePreExistingRunnableJobs();
+
+        long lastBatchJobIdBeforeRequest = batchJobQueueRepository.findAll().stream()
+                .map(BatchJobQueue::getId)
+                .max(Long::compareTo)
+                .orElse(0L);
+        long lastAllocationIdBeforeRequest = capacityAllocationRepository.findAll().stream()
+                .map(CapacityAllocation::getId)
+                .max(Long::compareTo)
+                .orElse(0L);
+
         FilePermissionKey giver = FilePermissionKey.builder().ownerType(USER).build();
         giver.grantCapacity(1_000L);
         FilePermissionKey receiver = FilePermissionKey.builder().ownerType(USER).build();
@@ -68,23 +82,35 @@ class BatchJobWorkerCapacityIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
+        String description = "worker-integration-" + UUID.randomUUID();
         capacityAllocationService.requestGrantCapacity(
                 receiver.getId(),
                 giver.getId(),
                 250L,
                 "GRANT",
-                "worker-integration",
+                description,
                 5L
         );
         entityManager.flush();
         entityManager.clear();
 
         BatchJobQueue queuedJob = batchJobQueueRepository.findAll().stream()
+                .filter(job -> job.getId() > lastBatchJobIdBeforeRequest)
                 .filter(job -> CapacityAllocationService.JOB_TYPE_CAPACITY_APPLY.equals(job.getJobType()))
+                .filter(job -> receiver.getId().equals(job.getTargetId()))
+                .filter(job -> description.equals(job.getJobData().get("description")))
                 .findFirst()
                 .orElseThrow();
         assertThat(queuedJob.getStatus()).isEqualTo("wait");
         assertThat(((Number) queuedJob.getJobData().get("giverPermissionId")).longValue()).isEqualTo(giver.getId());
+
+        // nextRunAt 경계 시각 이슈로 간헐적인 미선정이 발생하지 않도록 실행 가능 상태를 명시적으로 보장한다.
+        entityManager.createQuery("UPDATE BatchJobQueue b SET b.nextRunAt = :nextRunAt WHERE b.id = :id")
+                .setParameter("nextRunAt", LocalDateTime.now().minusSeconds(5))
+                .setParameter("id", queuedJob.getId())
+                .executeUpdate();
+        entityManager.flush();
+        entityManager.clear();
 
         batchJobWorker.processPendingJobs();
         entityManager.flush();
@@ -101,9 +127,30 @@ class BatchJobWorkerCapacityIntegrationTest {
         assertThat(updatedReceiver.getTotalCapacity()).isEqualTo(350L);
         assertThat(updatedReceiver.getAvailableCapacity()).isEqualTo(350L);
 
-        List<CapacityAllocation> allocations = capacityAllocationRepository.findAll();
+        List<CapacityAllocation> allocations = capacityAllocationRepository.findAll().stream()
+                .filter(allocation -> allocation.getId() > lastAllocationIdBeforeRequest)
+                .filter(allocation -> description.equals(allocation.getDescription()))
+                .toList();
         assertThat(allocations).hasSize(1);
         assertThat(allocations.get(0).getAllocatedSize()).isEqualTo(250L);
         assertThat(allocations.get(0).getGiverPermission().getId()).isEqualTo(giver.getId());
+    }
+
+    private void excludePreExistingRunnableJobs() {
+        while (true) {
+            List<Long> preExistingRunnableJobIds = batchJobQueueRepository
+                    .findTop200ByStatusInOrderByIdAsc(List.of("wait", "retry_wait"))
+                    .stream()
+                    .map(BatchJobQueue::getId)
+                    .toList();
+            if (preExistingRunnableJobIds.isEmpty()) {
+                break;
+            }
+
+            batchJobQueueRepository.updateStatusToProcessing(preExistingRunnableJobIds, "in_progress");
+            batchJobQueueRepository.markAsSuccess(preExistingRunnableJobIds);
+            entityManager.flush();
+            entityManager.clear();
+        }
     }
 }

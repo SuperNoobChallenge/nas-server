@@ -24,6 +24,14 @@ public interface BatchJobQueueRepository extends JpaRepository<BatchJobQueue, Lo
     List<BatchJobQueue> findTop200ByStatusInOrderByIdAsc(List<String> statuses);
 
     /**
+     * 현재 시각 기준으로 실제 실행 가능한 대기/재시도 작업 N개 조회 (오래된 순)
+     */
+    List<BatchJobQueue> findTop200ByStatusInAndNextRunAtLessThanEqualOrderByIdAsc(
+            List<String> statuses,
+            LocalDateTime now
+    );
+
+    /**
      * 가져온 작업들을 "처리 중"으로 한 방에 변경
      * - 중복 실행 방지 (Locking 역할)
      * - 시도 횟수 증가

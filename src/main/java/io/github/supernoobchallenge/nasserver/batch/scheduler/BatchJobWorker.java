@@ -46,13 +46,11 @@ public class BatchJobWorker {
     @Scheduled(fixedDelay = 1000)
     @Transactional
     public void processPendingJobs() {
-        // 1. [Polling] 대기/재시도 상태 중 실행 가능한 작업 선별
+        // 1. [Polling] 대기/재시도 상태 중 "실행 가능한" 작업만 조회
         LocalDateTime now = LocalDateTime.now();
-        List<BatchJobQueue> candidates = batchJobQueueRepository
-                .findTop200ByStatusInOrderByIdAsc(List.of("wait", "retry_wait"));
-
-        List<BatchJobQueue> jobs = candidates.stream()
-                .filter(job -> job.isRunnableAt(now))
+        List<BatchJobQueue> jobs = batchJobQueueRepository
+                .findTop200ByStatusInAndNextRunAtLessThanEqualOrderByIdAsc(List.of("wait", "retry_wait"), now)
+                .stream()
                 .limit(100)
                 .toList();
 
