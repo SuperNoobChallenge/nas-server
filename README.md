@@ -33,37 +33,35 @@
 ## Project Structure
 ```text
 nas-server/
-|-- build.gradle
-|-- README.md
-|-- gradlew
-|-- gradlew.bat
-|-- settings.gradle
-|-- gradle/
-|   `-- wrapper/
-|       |-- gradle-wrapper.jar
-|       `-- gradle-wrapper.properties
 |-- reference/
 |   `-- codex/
 `-- src/
     |-- main/
     |   |-- java/io/github/supernoobchallenge/nasserver/
-    |   |   |-- NasServerApplication.java
     |   |   |-- batch/
     |   |   |   |-- config/
     |   |   |   |-- entity/
-    |   |   |   |-- handler/impl/
+    |   |   |   |-- handler/
+    |   |   |   |   `-- impl/
     |   |   |   |-- repository/
     |   |   |   |-- scheduler/
     |   |   |   `-- service/
     |   |   |-- file/
-    |   |   |   |-- capacity/entity|repository|service/
-    |   |   |   |-- core/entity|repository/
-    |   |   |   `-- transfer/entity/
+    |   |   |   |-- capacity/
+    |   |   |   |   |-- entity/
+    |   |   |   |   |-- repository/
+    |   |   |   |   `-- service/
+    |   |   |   |-- core/
+    |   |   |   |   |-- entity/
+    |   |   |   |   `-- repository/
+    |   |   |   `-- transfer/
+    |   |   |       `-- entity/
     |   |   |-- global/
     |   |   |   |-- config/
     |   |   |   |-- entity/
     |   |   |   `-- security/
-    |   |   |-- group/entity/
+    |   |   |-- group/
+    |   |   |   `-- entity/
     |   |   |-- share/
     |   |   |   |-- controller/
     |   |   |   |-- dto/
@@ -77,22 +75,24 @@ nas-server/
     |   |       |-- repository/
     |   |       `-- service/
     |   `-- resources/
-    |       |-- application.properties
-    |       `-- schema (2)1.sql
-    `-- test/java/io/github/supernoobchallenge/nasserver/
-        |-- NasServerApplicationTests.java
-        |-- batch/handler/impl/
-        |-- batch/scheduler/
-        |-- connection/
-        |-- file/capacity/integration/
-        |-- file/capacity/service/
-        |-- repository/
-        |-- share/integration/
-        |-- user/integration/
-        `-- user/service/
+    `-- test/
+        `-- java/io/github/supernoobchallenge/nasserver/
+            |-- batch/
+            |   |-- handler/
+            |   |   `-- impl/
+            |   `-- scheduler/
+            |-- connection/
+            |-- file/
+            |   `-- capacity/
+            |       |-- integration/
+            |       `-- service/
+            |-- repository/
+            |-- share/
+            |   `-- integration/
+            `-- user/
+                |-- integration/
+                `-- service/
 ```
-
-Note: 위 구조는 `.gitignore` 기준으로 GitHub에 올라가지 않는 항목(예: `build/`, `.gradle/`, `.idea/`, `db.properties`, `reference/0*`)을 제외해 작성했습니다.
 
 ## Run
 Windows 기준:

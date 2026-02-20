@@ -1,4 +1,4 @@
-# commonMistakes
+# COMMON_MISTAKES
 
 Purpose: AI/Codex가 반복적으로 내는 실수를 사전에 차단한다.
 

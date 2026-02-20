@@ -27,7 +27,7 @@ Audience: LLM/Codex only.
   - 구현/테스트/문서 작성 규칙
 - `NAMING_STANDARD.md`
   - 클래스/메서드/API/테스트 명명 규칙
-- `commonMistakes.md`
+- `COMMON_MISTAKES.md`
   - AI/Codex 반복 실수 방지 체크리스트
 - `SESSION_LOG_SHORT.md`
   - 초단기 세션 로그 (한 줄 포맷)
