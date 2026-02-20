@@ -31,6 +31,8 @@ Audience: LLM/Codex only.
   - AI/Codex 반복 실수 방지 체크리스트
 - `SESSION_LOG_SHORT.md`
   - 초단기 세션 로그 (한 줄 포맷)
+- `DOMAIN_README_STANDARD.md`
+  - 도메인 패키지 README 작성/갱신 표준 (메서드 상호작용 중심)
 
 ## 3. Update Timing
 - 아래 이벤트가 발생하면 문서를 업데이트한다.

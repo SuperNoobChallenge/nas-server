@@ -41,3 +41,4 @@
 ## Rule
 - 작업 종료 시 `SESSION_BRIEF.md`, `PROJECT_HANDOFF.md`, `SESSION_LOG_SHORT.md`를 최신 사실로 즉시 갱신한다.
 - 스냅샷/우선순위가 바뀌면 `NEXT_SESSION_PROMPT.md`도 함께 갱신한다.
+- 도메인 패키지 README 작업 요청 시 `reference/codex/DOMAIN_README_STANDARD.md` 절차를 따른다.
