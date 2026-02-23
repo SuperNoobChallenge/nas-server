@@ -7,8 +7,52 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface VirtualDirectoryRepository extends JpaRepository<VirtualDirectory, Long> {
+    @Query("""
+            SELECT v
+            FROM VirtualDirectory v
+            WHERE v.id = :directoryId
+              AND v.deletedAt IS NULL
+            """)
+    Optional<VirtualDirectory> findActiveById(@Param("directoryId") Long directoryId);
+
+    @Query("""
+            SELECT v
+            FROM VirtualDirectory v
+            WHERE v.filePermission.id = :filePermissionId
+              AND (
+                    (:parentDirectoryId IS NULL AND v.parentDirectory IS NULL)
+                    OR (:parentDirectoryId IS NOT NULL AND v.parentDirectory.id = :parentDirectoryId)
+                  )
+              AND v.deletedAt IS NULL
+            ORDER BY v.name ASC, v.id ASC
+            """)
+    List<VirtualDirectory> findActiveChildren(
+            @Param("filePermissionId") Long filePermissionId,
+            @Param("parentDirectoryId") Long parentDirectoryId
+    );
+
+    @Query("""
+            SELECT (COUNT(v) > 0)
+            FROM VirtualDirectory v
+            WHERE v.filePermission.id = :filePermissionId
+              AND (
+                    (:parentDirectoryId IS NULL AND v.parentDirectory IS NULL)
+                    OR (:parentDirectoryId IS NOT NULL AND v.parentDirectory.id = :parentDirectoryId)
+                  )
+              AND v.name = :name
+              AND v.deletedAt IS NULL
+              AND (:excludeDirectoryId IS NULL OR v.id <> :excludeDirectoryId)
+            """)
+    boolean existsActiveSiblingName(
+            @Param("filePermissionId") Long filePermissionId,
+            @Param("parentDirectoryId") Long parentDirectoryId,
+            @Param("name") String name,
+            @Param("excludeDirectoryId") Long excludeDirectoryId
+    );
+
     // 1. [재귀 조회] 루트 ID들을 주면, 그 밑에 딸린 모든 자손 ID까지 다 긁어오기
     @Query(value = """
         WITH RECURSIVE CTE AS (

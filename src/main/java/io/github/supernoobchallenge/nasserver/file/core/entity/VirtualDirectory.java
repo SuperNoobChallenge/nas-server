@@ -46,11 +46,24 @@ public class VirtualDirectory extends BaseEntity {
     // ==========================================
     @Builder
     public VirtualDirectory(FilePermissionKey filePermission, VirtualDirectory parentDirectory, int readLevel, int writeLevel, String name) {
+        if (filePermission == null) {
+            throw new IllegalArgumentException("filePermission은 필수입니다.");
+        }
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("디렉터리 이름은 비어있을 수 없습니다.");
+        }
+        if (readLevel < 0 || writeLevel < 0) {
+            throw new IllegalArgumentException("권한 레벨은 0 이상이어야 합니다.");
+        }
+        if (readLevel > writeLevel) {
+            throw new IllegalArgumentException("읽기 레벨은 쓰기 레벨보다 클 수 없습니다.");
+        }
+
         this.filePermission = filePermission;
         this.parentDirectory = parentDirectory;
         this.readLevel = readLevel;
         this.writeLevel = writeLevel;
-        this.name = name;
+        this.name = name.trim();
 
         // depthLevel은 부모에 따라 자동으로 결정됨 (생성 시점)
         // 부모가 없으면(Root) 0, 있으면 부모+1
@@ -97,7 +110,7 @@ public class VirtualDirectory extends BaseEntity {
      */
     public void moveDirectory(VirtualDirectory newParent) {
         // 1. 자기 자신 밑으로 이동 방지 (기본적인 순환 참조 체크)
-        if (newParent != null && newParent.getId().equals(this.id)) {
+        if (newParent != null && this.id != null && this.id.equals(newParent.getId())) {
             throw new IllegalArgumentException("자기 자신을 부모로 설정할 수 없습니다.");
         }
 

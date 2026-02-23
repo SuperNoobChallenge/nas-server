@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BatchJobQueueRepository extends JpaRepository<BatchJobQueue, Long> {
 
@@ -16,6 +17,14 @@ public interface BatchJobQueueRepository extends JpaRepository<BatchJobQueue, Lo
      * Limit 기능은 메서드 이름(Top)으로 해결됨
      */
     List<BatchJobQueue> findTop100ByStatusOrderByIdAsc(String status);
+
+    Optional<BatchJobQueue> findTopByOrderByIdDesc();
+
+    List<BatchJobQueue> findByIdGreaterThanAndJobTypeAndTargetIdOrderByIdAsc(
+            Long id,
+            String jobType,
+            Long targetId
+    );
 
     /**
      * 대기/재시도 상태의 작업 N개 조회 (오래된 순)

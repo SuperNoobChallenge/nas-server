@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directory Tree</title>
+    <style>
+        body { font-family: "Segoe UI", sans-serif; background: #f7f7f8; margin: 0; padding: 16px; color: #222; }
+        .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .panel { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+        .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+        input { padding: 6px; border: 1px solid #bbb; border-radius: 4px; }
+        button { padding: 6px 10px; border: 1px solid #999; background: #f2f2f2; border-radius: 4px; cursor: pointer; }
+        ul { list-style: none; padding-left: 16px; margin: 8px 0; }
+        li { margin: 8px 0; }
+        .name { font-weight: 600; }
+        .meta { color: #666; font-size: 12px; margin-left: 6px; }
+        .ok { color: #1b7f3a; font-size: 14px; }
+        .err { color: #c0392b; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="bar">
+    <div><strong>Directory Console</strong> <span class="meta" th:text="|user=${requesterUserId}|"></span></div>
+    <form method="post" th:action="@{/web/logout}">
+        <button type="submit">로그아웃</button>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>루트 디렉터리 생성</h3>
+    <form method="post" th:action="@{/web/directories/create}" class="row">
+        <input type="hidden" name="parentDirectoryId" value="">
+        <input type="text" name="name" placeholder="name" required>
+        <input type="number" name="readLevel" placeholder="read" min="0" value="0" required>
+        <input type="number" name="writeLevel" placeholder="write" min="0" value="0" required>
+        <button type="submit">생성</button>
+    </form>
+    <p class="ok" th:if="${successMessage}" th:text="${successMessage}"></p>
+    <p class="err" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+</div>
+
+<div class="panel">
+    <h3>디렉터리 트리</h3>
+    <p th:if="${#lists.isEmpty(directoryTree)}">생성된 디렉터리가 없습니다.</p>
+    <ul th:if="${!#lists.isEmpty(directoryTree)}">
+        <li th:each="node : ${directoryTree}" th:insert="~{web/directories :: treeNode(node=${node})}"></li>
+    </ul>
+</div>
+
+<th:block th:fragment="treeNode(node)">
+    <div>
+        <span class="name" th:text="${node.name()}">name</span>
+        <span class="meta"
+              th:text="|id=${node.directoryId()}, parent=${node.parentDirectoryId()}, depth=${node.depthLevel()}, read=${node.readLevel()}, write=${node.writeLevel()}|"></span>
+    </div>
+
+    <div class="row">
+        <form method="post" th:action="@{|/web/directories/${node.directoryId()}/rename|}" class="row">
+            <input type="text" name="name" placeholder="new name" required>
+            <button type="submit">이름변경</button>
+        </form>
+
+        <form method="post" th:action="@{|/web/directories/${node.directoryId()}/move|}" class="row">
+            <input type="number" name="newParentDirectoryId" placeholder="parent id (blank=root)">
+            <button type="submit">이동</button>
+        </form>
+
+        <form method="post" th:action="@{|/web/directories/${node.directoryId()}/delete|}">
+            <button type="submit">삭제요청</button>
+        </form>
+    </div>
+
+    <div class="row">
+        <form method="post" th:action="@{/web/directories/create}" class="row">
+            <input type="hidden" name="parentDirectoryId" th:value="${node.directoryId()}">
+            <input type="text" name="name" placeholder="child name" required>
+            <input type="number" name="readLevel" placeholder="read" min="0" value="0" required>
+            <input type="number" name="writeLevel" placeholder="write" min="0" value="0" required>
+            <button type="submit">하위생성</button>
+        </form>
+    </div>
+
+    <ul th:if="${!#lists.isEmpty(node.children())}">
+        <li th:each="child : ${node.children()}" th:insert="~{web/directories :: treeNode(node=${child})}"></li>
+    </ul>
+</th:block>
+</body>
+</html>

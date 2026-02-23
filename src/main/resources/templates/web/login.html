@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAS Login</title>
+    <style>
+        body { font-family: "Segoe UI", sans-serif; background: #f4f6f8; margin: 0; }
+        .wrap { max-width: 420px; margin: 80px auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 24px; }
+        h1 { margin-top: 0; font-size: 22px; }
+        label { display: block; margin-top: 12px; font-size: 14px; color: #333; }
+        input { width: 100%; box-sizing: border-box; padding: 8px; margin-top: 6px; }
+        button { margin-top: 16px; width: 100%; padding: 10px; background: #0f6cbd; color: #fff; border: 0; border-radius: 4px; cursor: pointer; }
+        .error { margin-top: 12px; color: #c0392b; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>NAS Web Console</h1>
+    <form method="post" th:action="@{/web/login}">
+        <label for="loginId">Login ID</label>
+        <input id="loginId" name="loginId" type="text" required>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required>
+
+        <button type="submit">로그인</button>
+    </form>
+    <p class="error" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+</div>
+</body>
+</html>

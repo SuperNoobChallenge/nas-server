@@ -28,4 +28,15 @@ public class VirtualDirectoryStats extends AuditEntity {
 
     @Column(nullable = false)
     private int fileCount = 0;
+
+    private VirtualDirectoryStats(VirtualDirectory virtualDirectory) {
+        this.virtualDirectory = virtualDirectory;
+    }
+
+    public static VirtualDirectoryStats init(VirtualDirectory virtualDirectory) {
+        if (virtualDirectory == null) {
+            throw new IllegalArgumentException("virtualDirectory는 필수입니다.");
+        }
+        return new VirtualDirectoryStats(virtualDirectory);
+    }
 }
