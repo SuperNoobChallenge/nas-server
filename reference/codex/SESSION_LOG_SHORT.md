@@ -21,6 +21,72 @@ Format:
 
 Entries:
 
+## 2026-02-23 19:58
+- current_feature: 디렉터리 트리 API의 계정 인증 컨텍스트를 세션 사용자 기준으로 전환
+- related_files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java
+  - reference/TODO.md
+  - reference/codex/SESSION_BRIEF.md
+  - reference/codex/PROJECT_HANDOFF.md
+- last_ai_work: `/api/directories/tree`의 `user_id=1` 고정 로직을 제거하고 인증 세션 사용자 ID를 사용하도록 변경했으며, 사용자별 트리 반환 통합 테스트를 추가
+- verification: `.\gradlew.bat test --tests "*VirtualDirectoryControllerIntegrationTest" --tests "*VirtualDirectoryPageControllerIntegrationTest" --tests "*VirtualDirectoryServiceTest"` 통과
+
+## 2026-02-23 19:43
+- current_feature: Thymeleaf 기반 웹 화면 전환(로그인 + 디렉터리 트리 관리 페이지)
+- related_files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryPageController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java
+  - src/main/resources/templates/web/login.html
+  - src/main/resources/templates/web/directories.html
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryPageControllerIntegrationTest.java
+- last_ai_work: `/web/login` 로그인 화면과 `/web/directories` 트리 관리 화면(생성/이름변경/이동/삭제요청)을 서버 렌더링으로 추가하고 보안 permit 경계를 조정
+- verification: `.\gradlew.bat test --tests "*VirtualDirectoryPageControllerIntegrationTest" --tests "*VirtualDirectoryControllerIntegrationTest" --tests "*VirtualDirectoryServiceTest"` 통과
+
+## 2026-02-23 19:36
+- current_feature: 기본 계정(`user_id=1`) 기준 가상 디렉터리 트리 조회 API 추가
+- related_files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/VirtualDirectoryTreeResponse.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryServiceTest.java
+- last_ai_work: `GET /api/directories/tree`를 추가하고 서비스에 재귀 트리 빌드 로직을 구현했으며, `MoveVirtualDirectory` 배치 테스트 안정화 상태를 유지한 채 관련 단위/통합 테스트를 재검증
+- verification: `.\gradlew.bat test --tests "*VirtualDirectoryServiceTest" --tests "*VirtualDirectoryControllerIntegrationTest"` 통과
+
+## 2026-02-23 18:45
+- current_feature: 가상 디렉터리 삭제 배치 테스트 `success`/`wait` 경계 시각 플래키 추가 보정
+- related_files:
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java
+- last_ai_work: `forceJobRunnableNow`가 DB `CURRENT_TIMESTAMP`를 쓰던 부분을 `LocalDateTime.now().minusSeconds(5)` 파라미터 방식으로 변경해 DB/애플리케이션 시각 경계 차이로 인한 `wait` 잔류를 차단
+- verification: `.\gradlew.bat test --tests "*VirtualDirectoryControllerIntegrationTest"` 통과
+
+## 2026-02-23 18:43
+- current_feature: 가상 디렉터리 배치 처리 통합테스트 플래키(`wait` 잔류) 안정화
+- related_files:
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java
+- last_ai_work: 삭제 처리 테스트에 기존 runnable 잡 제외 루프와 대상 잡 `nextRunAt` runnable 강제 업데이트를 추가해 공유 DB/경계 시각 영향으로 `success`가 `wait`로 남는 문제를 제거
+- verification: `.\gradlew.bat test --tests "*VirtualDirectoryControllerIntegrationTest"` 통과
+
+## 2026-02-23 18:40
+- current_feature: 가상 디렉터리 삭제 요청의 배치 워커 처리 완료 여부 통합 검증 추가
+- related_files:
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java
+- last_ai_work: 삭제 API 호출 후 `BatchJobWorker.processPendingJobs()`를 직접 실행해 `DIRECTORY_DELETE` 작업이 `success`로 완료되고 대상 디렉터리가 soft delete 되는지 확인하는 테스트를 추가
+- verification: `.\gradlew.bat test --tests "*VirtualDirectoryControllerIntegrationTest"` 통과
+
+## 2026-02-23 18:20
+- current_feature: `file/core` 가상 디렉터리 시스템 API(생성/조회/이름변경/이동/삭제요청) 구현
+- related_files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryRepository.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryStatsRepository.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/entity/VirtualDirectoryStats.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryServiceTest.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java
+- last_ai_work: 세션 사용자 기반 소유권 검증, 동일 경로 이름 중복 차단, 하위 트리 순환 이동 차단, 삭제 배치 위임(`DIRECTORY_DELETE`)과 stats 초기화를 포함한 가상 디렉터리 기능을 추가
+- verification: `.\gradlew.bat test --tests "*VirtualDirectoryServiceTest" --tests "*VirtualDirectoryControllerIntegrationTest"` 통과
+
 ## 2026-02-13 21:51
 - current_feature: 다음 세션용 codex 문서 최신 동기화 (이슈 성격 명시)
 - related_files:

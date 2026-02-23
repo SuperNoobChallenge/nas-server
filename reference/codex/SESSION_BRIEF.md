@@ -1,6 +1,6 @@
 # SESSION_BRIEF
 
-Updated: 2026-02-13
+Updated: 2026-02-23
 Project: nas-server
 Path: C:\GitFile\nas-server
 Purpose: Short, practical briefing for the next Codex session.
@@ -174,6 +174,62 @@ Purpose: Short, practical briefing for the next Codex session.
   - src/main/java/io/github/supernoobchallenge/nasserver/batch/repository/BatchJobQueueRepository.java
   - src/test/java/io/github/supernoobchallenge/nasserver/batch/scheduler/BatchJobWorkerCapacityIntegrationTest.java
 
+### 14) Virtual directory core API added
+- Added authenticated virtual directory API:
+  - POST /api/directories
+  - GET /api/directories?parentDirectoryId={id}
+  - PATCH /api/directories/{directoryId}/name
+  - PATCH /api/directories/{directoryId}/parent
+  - DELETE /api/directories/{directoryId}
+- Added service-level validations:
+  - requester ownership by `filePermission`
+  - sibling name duplication check
+  - descendant-cycle move prevention
+  - delete delegation to batch `DIRECTORY_DELETE` job
+- Added `virtual_directory_stats` initialization on directory create.
+- Key files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryRepository.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryStatsRepository.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryServiceTest.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java
+
+### 15) Virtual directory tree API added
+- Added tree endpoint:
+  - GET /api/directories/tree
+- Current behavior:
+  - tree is built recursively from `VirtualDirectoryService.listDirectoryTree(...)`
+  - requester is resolved from authenticated session user
+- Key files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/VirtualDirectoryTreeResponse.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryServiceTest.java
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java
+
+### 16) Thymeleaf web pages added (login + directory management)
+- Added server-rendered pages:
+  - GET /web/login
+  - POST /web/login
+  - POST /web/logout
+  - GET /web/directories
+  - POST /web/directories/create
+  - POST /web/directories/{directoryId}/rename
+  - POST /web/directories/{directoryId}/move
+  - POST /web/directories/{directoryId}/delete
+- Added templates:
+  - `templates/web/login.html`
+  - `templates/web/directories.html`
+- Security update:
+  - `/`, `/web/login` added to permit-all
+- Key files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryPageController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java
+  - src/main/resources/templates/web/login.html
+  - src/main/resources/templates/web/directories.html
+  - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryPageControllerIntegrationTest.java
+
 ## B. Test Status
 
 ### Unit tests
@@ -181,6 +237,8 @@ Purpose: Short, practical briefing for the next Codex session.
 - User service unit tests: passing
 - Auth service unit tests: passing
 - Password reset service unit tests: passing
+- Virtual directory service unit tests: passing
+- Virtual directory tree service unit tests: passing
 
 ### Integration tests (Spring + real DB)
 - UserServiceIntegrationTest: passing
@@ -189,16 +247,20 @@ Purpose: Short, practical briefing for the next Codex session.
 - ShareInvitationIntegrationTest: passing
 - CapacityAllocationBatchIntegrationTest: passing
 - BatchJobWorkerCapacityIntegrationTest: passing
+- VirtualDirectoryControllerIntegrationTest: passing
+- VirtualDirectoryPageControllerIntegrationTest: passing
 
 ## C. Constraints / Environment Notes
 - DB config comes from src/main/resources/db.properties.
 - Tests are designed to run with real DB (`@AutoConfigureTestDatabase(replace = NONE)` where applicable).
 - Audit columns are not-null; `AuditorAwareImpl` must return a valid system id (currently 1).
+- `reference/TODO.md`는 사용자 요청이 없어도 작업 중 발견/완료 항목을 기준으로 상시 갱신한다.
 
 ## D. Suggested Immediate Next Work
 1. Add admin recovery on boot as per requirement docs.
 2. Add API layer for capacity request enqueue.
 3. Expand README API section with request/response examples for user/auth/share/password-reset APIs.
+4. Add directory 권한 모델(read/write level + 사용자 권한) 검증 로직을 API 계층에 확장.
 
 ## D-1. Open Issues / TODO Priority
 1. Invite link does not currently bind target email in DB (share_links schema has no invitee email column).
@@ -207,6 +269,8 @@ Purpose: Short, practical briefing for the next Codex session.
 4. Admin recovery-on-boot flow is still missing.
 5. Batch naming consistency and enum refactor are pending.
 6. `User.filePermission` cardinality policy (`@OneToOne` vs `@ManyToOne`) is undecided.
+7. Virtual directory API currently validates ownership by `filePermission` only; user-level ACL 정책 확장은 미구현.
+8. 웹 폼 기반 화면은 현재 CSRF 비활성 상태(`SecurityConfig`)를 전제로 동작하며, 추후 CSRF 정책 재설계 필요.
 
 ## E. Quick Verification Commands
 - Compile:
@@ -215,3 +279,5 @@ Purpose: Short, practical briefing for the next Codex session.
   - .\gradlew.bat test --tests "*UserServiceIntegrationTest" --tests "*AuthControllerIntegrationTest"
 - Capacity + worker integration tests:
   - .\gradlew.bat test --tests "*CapacityAllocationBatchIntegrationTest" --tests "*BatchJobWorkerCapacityIntegrationTest"
+- Virtual directory tests:
+  - .\gradlew.bat test --tests "*VirtualDirectoryServiceTest" --tests "*VirtualDirectoryControllerIntegrationTest"

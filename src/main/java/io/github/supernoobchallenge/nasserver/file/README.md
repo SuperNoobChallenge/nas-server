@@ -1,16 +1,20 @@
 # file Domain Package
 
-파일 권한/용량, 가상 파일 구조, 실제 파일 참조 카운트, 업로드 세션 모델을 담당하는 도메인입니다.
+파일 권한/용량, 가상 디렉터리/파일 구조, 실제 파일 참조 카운트, 업로드 세션 모델을 담당하는 도메인입니다.
 
 ## 구성 요소 역할
 - `capacity/service/CapacityAllocationService`
   - 용량 부여/회수 요청을 검증하고 배치 작업으로 등록합니다.
 - `capacity/entity/CapacityAllocation`
   - 용량 이동 이력(수신자/제공자/크기/타입/설명)을 저장합니다.
+- `core/controller/VirtualDirectoryController`
+  - 가상 디렉터리 생성/조회/이름변경/이동/삭제요청 API를 제공합니다.
+- `core/service/VirtualDirectoryService`
+  - 디렉터리 접근권한/중복이름/순환이동 검증과 배치 삭제 위임을 수행합니다.
 - `core/entity/FilePermissionKey`
   - 총 용량/가용 용량 변경 규칙을 보장합니다.
 - `core/repository/*`
-  - 삭제 작업용 집계/soft delete/참조 카운트 감소, 권한키 잠금 조회를 담당합니다.
+  - 디렉터리 활성 조회, 형제 이름 중복 검사, 삭제 작업용 집계/soft delete/참조 카운트 감소를 담당합니다.
 - `transfer/entity/*`
   - 업로드 세션/파트 저장 모델입니다(현재는 엔티티 중심).
 
@@ -36,7 +40,16 @@
 
 핵심: 용량 수치의 무결성은 `FilePermissionKey` 도메인 메서드가 강제합니다.
 
-### 3) 파일/디렉터리 삭제 시 참조 카운트 연계 흐름
+### 3) 가상 디렉터리 생성/이동/삭제요청 흐름
+1. `VirtualDirectoryController`가 세션 사용자 ID를 추출해 `VirtualDirectoryService` 호출
+2. `VirtualDirectoryService`가 사용자 `filePermission` 기준 접근권한을 검증
+3. 생성/이름변경/이동 시 `VirtualDirectoryRepository.existsActiveSiblingName`로 중복 이름 차단
+4. 이동 시 `VirtualDirectoryRepository.findAllDescendantIds`로 하위 트리 순환 이동 차단
+5. 삭제는 즉시 삭제하지 않고 `batch/DirectoryService.deleteDirectory`로 배치 작업 등록
+
+핵심: 디렉터리 변경은 동기 검증으로 무결성을 지키고, 무거운 삭제는 비동기 배치로 위임합니다.
+
+### 4) 파일/디렉터리 삭제 시 참조 카운트 연계 흐름
 1. 배치 삭제 핸들러가 `VirtualFileRepository.countActiveByDirectoryIds` 또는 `countActiveByRealFileIds`로 감소량 집계
 2. `VirtualFileRepository.softDeleteByDirectoryIds` 또는 `softDeleteByVirtualFileIds` 실행
 3. 집계 결과를 기준으로 `RealFileRepository.decrementReferenceCount` 호출
@@ -52,4 +65,5 @@
   - 디렉터리 이름/권한/부모 이동 시 기본 검증과 depth 재계산을 수행합니다.
 
 ## 현재 상태 메모
+- 가상 디렉터리 API(`/api/directories`)는 생성/조회/이름변경/이동/삭제요청까지 구현 완료되었습니다.
 - `transfer` 패키지는 현재 업로드 세션/파트 엔티티만 존재하며, 서비스/컨트롤러 흐름은 아직 구현 전입니다.

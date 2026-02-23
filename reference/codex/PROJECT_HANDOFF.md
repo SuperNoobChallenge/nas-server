@@ -1,6 +1,6 @@
 # Codex Session Handoff - NAS Server
 
-Last Updated: 2026-02-13
+Last Updated: 2026-02-23
 Scope: `C:\GitFile\nas-server`
 Audience: LLM/Codex only
 Update Policy: This file can and should be updated multiple times during the project. Keep appending/revising session notes as work progresses.
@@ -180,6 +180,54 @@ Update Policy: This file can and should be updated multiple times during the pro
 - Guidance:
   - keep both for now; do not remove test hardening unless worker execution timing is fully controlled in test environment.
 
+### 2.11 Virtual directory core system (file/core)
+- Added authenticated API controller:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java`
+  - endpoints:
+    - `POST /api/directories`
+    - `GET /api/directories?parentDirectoryId={id}`
+    - `PATCH /api/directories/{directoryId}/name`
+    - `PATCH /api/directories/{directoryId}/parent`
+    - `DELETE /api/directories/{directoryId}`
+- Added core service:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java`
+  - requester ownership validation by `User.filePermission`
+  - sibling duplicate-name guard
+  - descendant-cycle move guard (`findAllDescendantIds`)
+  - delete request delegation to batch `DirectoryService` (`DIRECTORY_DELETE`)
+- Repository extensions:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryRepository.java`
+    - `findActiveById`, `findActiveChildren`, `existsActiveSiblingName`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryStatsRepository.java`
+- Entity/repository support updates:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/entity/VirtualDirectoryStats.java`
+    - `VirtualDirectoryStats.init(...)` for create-time stats row init
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/entity/VirtualDirectory.java`
+    - builder-level input validation hardening
+  - `src/main/java/io/github/supernoobchallenge/nasserver/batch/repository/BatchJobQueueRepository.java`
+    - helper finders for baseline/new-job verification in integration test
+
+### 2.12 Virtual directory tree API (`GET /api/directories/tree`)
+- Added recursive tree response API:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/VirtualDirectoryTreeResponse.java`
+- Current policy:
+  - endpoint resolves requester from authenticated session user context.
+
+### 2.13 Thymeleaf server-rendered web flow
+- Added web controller:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryPageController.java`
+- Added pages:
+  - `src/main/resources/templates/web/login.html`
+  - `src/main/resources/templates/web/directories.html`
+- Added routes:
+  - login/logout pages (`/web/login`, `/web/logout`)
+  - directory management page (`/web/directories`) with create/rename/move/delete form actions
+- Security config updated:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java`
+  - permit-all includes `/` and `/web/login`
+
 ## 3. Tests Added/Updated
 
 ### 3.1 Unit Tests
@@ -189,6 +237,9 @@ Update Policy: This file can and should be updated multiple times during the pro
   - includes inviter-based registration test
 - `src/test/java/io/github/supernoobchallenge/nasserver/user/service/AuthServiceTest.java`
 - `src/test/java/io/github/supernoobchallenge/nasserver/user/service/PasswordResetServiceTest.java`
+- `src/test/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryServiceTest.java`
+  - create/duplicate/move-cycle/delete-delegate/list-children behaviors verified
+  - tree recursive response behavior verified
 
 ### 3.2 Integration Tests
 - `src/test/java/io/github/supernoobchallenge/nasserver/file/capacity/integration/CapacityAllocationBatchIntegrationTest.java`
@@ -203,6 +254,10 @@ Update Policy: This file can and should be updated multiple times during the pro
   - Spring + real DB: invite-register/password-change/password-reset + auth-boundary behavior verified
 - `src/test/java/io/github/supernoobchallenge/nasserver/share/integration/ShareInvitationIntegrationTest.java`
   - Spring + real DB: invite link create + invite register + use-count guard verified
+- `src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryControllerIntegrationTest.java`
+  - Spring + real DB: create/list/rename/move/delete-request API behavior verified
+- `src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryPageControllerIntegrationTest.java`
+  - Spring + real DB: web login and directory page form flow verified
 
 ### 3.3 Existing Test Expectation Changed
 - `src/test/java/io/github/supernoobchallenge/nasserver/repository/FilePermissionKeyRepositoryTest.java`
@@ -213,6 +268,10 @@ Update Policy: This file can and should be updated multiple times during the pro
   - `./gradlew.bat test --tests "*CapacityAllocationServiceTest" --tests "*FilePermissionCapacityApplyHandlerTest" --tests "*CapacityAllocationBatchIntegrationTest" --tests "*BatchJobWorkerCapacityIntegrationTest" --tests "*UserServiceTest" --tests "*AuthServiceTest" --tests "*UserServiceIntegrationTest" --tests "*AuthControllerIntegrationTest"`
 - Compile only:
   - `./gradlew.bat compileJava`
+- Virtual directory:
+  - `./gradlew.bat test --tests "*VirtualDirectoryServiceTest" --tests "*VirtualDirectoryControllerIntegrationTest"`
+- Virtual directory web:
+  - `./gradlew.bat test --tests "*VirtualDirectoryPageControllerIntegrationTest"`
 
 ## 5. Known Constraints / Assumptions
 - Tests currently run with local MySQL config (`db.properties`) in this environment.
@@ -237,3 +296,5 @@ Update Policy: This file can and should be updated multiple times during the pro
    - status/jobType are raw strings (not enums)
    - naming drift exists between schema docs and entity field names (`retry_count` vs `attempt_count`, etc).
 6. Potential model decision pending: whether `User.filePermission` should remain `@OneToOne` or be moved to `@ManyToOne` by policy.
+7. Virtual directory API currently enforces ownership by `filePermission` boundary only; fine-grained user-level ACL checks are pending.
+8. Web pages currently run with CSRF disabled security setup; if CSRF is re-enabled, form tokens/template update are required.
