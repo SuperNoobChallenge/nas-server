@@ -72,6 +72,18 @@ public class User extends BaseEntity {
     }
 
     /**
+     * 로그인 ID 변경
+     * @param newLoginId 새 로그인 ID
+     */
+    public void changeLoginId(String newLoginId) {
+        if (newLoginId == null || newLoginId.isBlank()) {
+            throw new IllegalArgumentException("loginId는 비어있을 수 없습니다.");
+        }
+
+        this.loginId = newLoginId;
+    }
+
+    /**
      * 이메일 변경
      * @param newEmail 새 이메일 주소
      */

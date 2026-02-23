@@ -40,6 +40,9 @@ out/
 db.yml
 db.properties
 
+### System
+#system.properties
+
 ### Reference ##
 reference/0*
 .codex/
