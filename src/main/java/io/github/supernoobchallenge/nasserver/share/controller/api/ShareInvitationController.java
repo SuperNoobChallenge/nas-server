@@ -1,10 +1,10 @@
-package io.github.supernoobchallenge.nasserver.share.controller;
+package io.github.supernoobchallenge.nasserver.share.controller.api;
 
-import io.github.supernoobchallenge.nasserver.share.dto.CreateInviteLinkRequest;
+import io.github.supernoobchallenge.nasserver.global.dto.api.ErrorResponse;
+import io.github.supernoobchallenge.nasserver.share.dto.api.CreateInviteLinkRequest;
 import io.github.supernoobchallenge.nasserver.share.dto.CreateInviteLinkResponse;
 import io.github.supernoobchallenge.nasserver.share.service.ShareInvitationService;
 import io.github.supernoobchallenge.nasserver.global.security.AuditorAwareImpl;
-import io.github.supernoobchallenge.nasserver.user.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

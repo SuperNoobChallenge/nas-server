@@ -1,4 +1,4 @@
-package io.github.supernoobchallenge.nasserver.share.dto;
+package io.github.supernoobchallenge.nasserver.share.dto.api;
 
 public record CreateInviteLinkRequest(
         String name,

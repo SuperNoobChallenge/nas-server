@@ -1,6 +1,6 @@
 # SESSION_BRIEF
 
-Updated: 2026-02-23
+Updated: 2026-02-24
 Project: nas-server
 Path: C:\GitFile\nas-server
 Purpose: Short, practical briefing for the next Codex session.
@@ -53,8 +53,8 @@ Purpose: Short, practical briefing for the next Codex session.
   - LOGIN_ID
 - Key files:
   - src/main/java/io/github/supernoobchallenge/nasserver/user/service/AuthService.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/AuthController.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/LoginRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/AuthController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/LoginRequest.java
   - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/LoginResponse.java
 
 ### 5) User REST API added (register/change-password)
@@ -65,11 +65,11 @@ Purpose: Short, practical briefing for the next Codex session.
   - InviteRegisterRequest, InviteRegisterResponse, ChangePasswordRequest, ErrorResponse
 - Added controller-level `IllegalArgumentException` -> HTTP 400 mapping.
 - Key files:
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/UserController.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/InviteRegisterRequest.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/InviteRegisterResponse.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/ChangePasswordRequest.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/ErrorResponse.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/UserController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/InviteRegisterRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/InviteRegisterResponse.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/ChangePasswordRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/dto/api/ErrorResponse.java
 
 ### 6) Share invitation flow added (share link -> invited user register)
 - Added invite link creation API:
@@ -87,14 +87,14 @@ Purpose: Short, practical briefing for the next Codex session.
   - Controller policy: direct public signup (`POST /api/users`) is disabled; invite-register only.
   - invite link 생성 시 inviter는 요청 바디가 아니라 로그인 세션 사용자 ID를 사용.
 - Key files:
-  - src/main/java/io/github/supernoobchallenge/nasserver/share/controller/ShareInvitationController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/share/controller/api/ShareInvitationController.java
   - src/main/java/io/github/supernoobchallenge/nasserver/share/service/ShareInvitationService.java
   - src/main/java/io/github/supernoobchallenge/nasserver/share/repository/ShareLinkRepository.java
   - src/main/java/io/github/supernoobchallenge/nasserver/share/entity/ShareLink.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/share/dto/CreateInviteLinkRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/share/dto/api/CreateInviteLinkRequest.java
   - src/main/java/io/github/supernoobchallenge/nasserver/share/dto/CreateInviteLinkResponse.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/InviteRegisterRequest.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/InviteRegisterResponse.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/InviteRegisterRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/InviteRegisterResponse.java
 
 ### 7) Spring Security authorization boundaries applied
 - Public endpoints:
@@ -125,7 +125,7 @@ Purpose: Short, practical briefing for the next Codex session.
   - src/main/java/io/github/supernoobchallenge/nasserver/user/service/PasswordResetService.java
   - src/main/java/io/github/supernoobchallenge/nasserver/user/service/PasswordResetMailService.java
   - src/main/java/io/github/supernoobchallenge/nasserver/user/service/LoggingPasswordResetMailService.java
-  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/UserController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/UserController.java
   - src/main/java/io/github/supernoobchallenge/nasserver/share/entity/ShareLink.java
   - src/main/java/io/github/supernoobchallenge/nasserver/share/repository/ShareLinkRepository.java
 
@@ -188,7 +188,7 @@ Purpose: Short, practical briefing for the next Codex session.
   - delete delegation to batch `DIRECTORY_DELETE` job
 - Added `virtual_directory_stats` initialization on directory create.
 - Key files:
-  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java
   - src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java
   - src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryRepository.java
   - src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualDirectoryStatsRepository.java
@@ -202,7 +202,7 @@ Purpose: Short, practical briefing for the next Codex session.
   - tree is built recursively from `VirtualDirectoryService.listDirectoryTree(...)`
   - requester is resolved from authenticated session user
 - Key files:
-  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java
   - src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java
   - src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/VirtualDirectoryTreeResponse.java
   - src/test/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryServiceTest.java
@@ -224,11 +224,52 @@ Purpose: Short, practical briefing for the next Codex session.
 - Security update:
   - `/`, `/web/login` added to permit-all
 - Key files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/WebAuthPageController.java
   - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryPageController.java
   - src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java
   - src/main/resources/templates/web/login.html
   - src/main/resources/templates/web/directories.html
   - src/test/java/io/github/supernoobchallenge/nasserver/file/core/integration/VirtualDirectoryPageControllerIntegrationTest.java
+
+### 17) System account bootstrap provisioning added (`user_id=1`)
+- Added boot-time system account provisioning/sync flow:
+  - if `user_id=1` exists: sync `loginId/password` from `system.properties`
+  - if `user_id=1` missing: auto-create system user + user permission with fixed PK `1`
+- Refactored structure to bootstrap + provisioning service:
+  - initializer: orchestration only
+  - provisioning service: create/sync business logic
+  - properties: `@ConfigurationProperties(prefix="system.account")`
+- Config key set:
+  - `system.account.login-id`
+  - `system.account.password`
+  - `system.account.email`
+- Key files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountInitializer.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProvisioningService.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProperties.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserRepository.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserPermissionRepository.java
+  - src/main/resources/application.properties
+
+### 18) API package separation + API DTO path standardization
+- API controllers are now separated under `controller/api`:
+  - `user/controller/api`, `share/controller/api`, `file/core/controller/api`
+- Web page auth routes (`/`, `/web/login`, `/web/logout`) were split into a dedicated page controller:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/WebAuthPageController.java`
+- API-only DTO location is standardized to `dto/api`:
+  - request/response DTOs used only by REST endpoints moved from `*/dto` to `*/dto/api`
+  - shared API error DTO moved to `src/main/java/io/github/supernoobchallenge/nasserver/global/dto/api/ErrorResponse.java`
+  - service/domain shared DTOs (e.g., `LoginResponse`, `CreateInviteLinkResponse`, `VirtualDirectoryTreeResponse`) remain in existing `dto`
+- Key files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/AuthController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/UserController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/share/controller/api/ShareInvitationController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/LoginRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/InviteRegisterRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/share/dto/api/CreateInviteLinkRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/api/CreateVirtualDirectoryRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/dto/api/ErrorResponse.java
 
 ## B. Test Status
 
@@ -239,6 +280,7 @@ Purpose: Short, practical briefing for the next Codex session.
 - Password reset service unit tests: passing
 - Virtual directory service unit tests: passing
 - Virtual directory tree service unit tests: passing
+- System account provisioning unit tests: passing
 
 ### Integration tests (Spring + real DB)
 - UserServiceIntegrationTest: passing
@@ -252,12 +294,13 @@ Purpose: Short, practical briefing for the next Codex session.
 
 ## C. Constraints / Environment Notes
 - DB config comes from src/main/resources/db.properties.
+- system bootstrap config is loaded from `src/main/resources/system.properties` via `spring.config.import` and uses `system.account.*` keys.
 - Tests are designed to run with real DB (`@AutoConfigureTestDatabase(replace = NONE)` where applicable).
 - Audit columns are not-null; `AuditorAwareImpl` must return a valid system id (currently 1).
 - `reference/TODO.md`는 사용자 요청이 없어도 작업 중 발견/완료 항목을 기준으로 상시 갱신한다.
 
 ## D. Suggested Immediate Next Work
-1. Add admin recovery on boot as per requirement docs.
+1. Define/implement strict admin recovery policy on boot (trigger-file based) on top of current system-account sync/create.
 2. Add API layer for capacity request enqueue.
 3. Expand README API section with request/response examples for user/auth/share/password-reset APIs.
 4. Add directory 권한 모델(read/write level + 사용자 권한) 검증 로직을 API 계층에 확장.
@@ -266,7 +309,7 @@ Purpose: Short, practical briefing for the next Codex session.
 1. Invite link does not currently bind target email in DB (share_links schema has no invitee email column).
 2. Password reset token is currently stored in `share_links` (`PASSWORD_RESET`) rather than dedicated token table.
 3. Password reset mail service default implementation is logging only (real SMTP/provider adapter not wired yet).
-4. Admin recovery-on-boot flow is still missing.
+4. System account sync/create on boot is implemented, but requirement-level recovery trigger-file flow is still not implemented.
 5. Batch naming consistency and enum refactor are pending.
 6. `User.filePermission` cardinality policy (`@OneToOne` vs `@ManyToOne`) is undecided.
 7. Virtual directory API currently validates ownership by `filePermission` only; user-level ACL 정책 확장은 미구현.

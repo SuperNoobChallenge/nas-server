@@ -1,6 +1,6 @@
 # Codex Session Handoff - NAS Server
 
-Last Updated: 2026-02-23
+Last Updated: 2026-02-24
 Scope: `C:\GitFile\nas-server`
 Audience: LLM/Codex only
 Update Policy: This file can and should be updated multiple times during the project. Keep appending/revising session notes as work progresses.
@@ -67,7 +67,7 @@ Update Policy: This file can and should be updated multiple times during the pro
   - `SYSTEM_USER_ID = 1L`
 - Added auth API/service:
   - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/AuthService.java`
-  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/AuthController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/AuthController.java`
   - `POST /api/auth/login`, `POST /api/auth/logout`
   - Session attributes: `LOGIN_USER_ID`, `LOGIN_ID`
 - Security authorization policy applied:
@@ -77,21 +77,21 @@ Update Policy: This file can and should be updated multiple times during the pro
 
 ### 2.3 User REST API (register/change-password)
 - Added user controller:
-  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/UserController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/UserController.java`
 - Added endpoints:
   - `POST /api/users/invite-register` (invite register only)
   - `PATCH /api/users/{userId}/password` (change password)
 - Added DTOs:
-  - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/RegisterUserRequest.java`
-  - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/RegisterUserResponse.java`
-  - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/ChangePasswordRequest.java`
-  - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/ErrorResponse.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/RegisterUserRequest.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/RegisterUserResponse.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/ChangePasswordRequest.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/global/dto/api/ErrorResponse.java`
 - `IllegalArgumentException` from this controller is mapped to HTTP 400 with `{ "message": ... }`.
 - Direct public signup endpoint `POST /api/users` is disabled by policy.
 
 ### 2.4 Share invitation link flow (based on share_links schema)
 - Added share invitation controller/service:
-  - `src/main/java/io/github/supernoobchallenge/nasserver/share/controller/ShareInvitationController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/share/controller/api/ShareInvitationController.java`
   - `src/main/java/io/github/supernoobchallenge/nasserver/share/service/ShareInvitationService.java`
 - Added share link repository:
   - `src/main/java/io/github/supernoobchallenge/nasserver/share/repository/ShareLinkRepository.java`
@@ -182,7 +182,7 @@ Update Policy: This file can and should be updated multiple times during the pro
 
 ### 2.11 Virtual directory core system (file/core)
 - Added authenticated API controller:
-  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java`
   - endpoints:
     - `POST /api/directories`
     - `GET /api/directories?parentDirectoryId={id}`
@@ -209,24 +209,60 @@ Update Policy: This file can and should be updated multiple times during the pro
 
 ### 2.12 Virtual directory tree API (`GET /api/directories/tree`)
 - Added recursive tree response API:
-  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java`
   - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/service/VirtualDirectoryService.java`
   - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/VirtualDirectoryTreeResponse.java`
 - Current policy:
   - endpoint resolves requester from authenticated session user context.
 
 ### 2.13 Thymeleaf server-rendered web flow
-- Added web controller:
+- Added web controllers (page routing split):
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/WebAuthPageController.java`
   - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/VirtualDirectoryPageController.java`
 - Added pages:
   - `src/main/resources/templates/web/login.html`
   - `src/main/resources/templates/web/directories.html`
 - Added routes:
-  - login/logout pages (`/web/login`, `/web/logout`)
+  - auth page routes (`/`, `/web/login`, `/web/logout`)
   - directory management page (`/web/directories`) with create/rename/move/delete form actions
 - Security config updated:
   - `src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java`
   - permit-all includes `/` and `/web/login`
+
+### 2.14 System account bootstrap provisioning (`user_id=1`)
+- Added boot-time system account provisioning:
+  - if `user_id=1` exists: sync `loginId/password` from `system.properties`
+  - if `user_id=1` missing: auto-create user(`id=1`) + `user_permissions` row with fixed PK
+- Refactored to bootstrap + provisioning service split:
+  - orchestrator: `src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountInitializer.java`
+  - service: `src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProvisioningService.java`
+  - config binding: `src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProperties.java`
+- Repository additions for fixed-id native insert:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserRepository.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserPermissionRepository.java`
+- Config import update:
+  - `src/main/resources/application.properties` now imports `system.properties`
+- Config key naming update:
+  - switched from `system.id/password/email` to `system.account.login-id/password/email`
+  - `SystemAccountProperties` field `id` renamed to `loginId` for semantic clarity
+
+### 2.15 API package boundary refactor (`controller/api` + `dto/api`)
+- REST controllers were moved from domain `controller` to `controller/api`:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/AuthController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/UserController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/share/controller/api/ShareInvitationController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java`
+- API-only DTOs were moved under domain `dto/api`:
+  - user request/response DTOs:
+    - `src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/*`
+  - share invite request DTO:
+    - `src/main/java/io/github/supernoobchallenge/nasserver/share/dto/api/CreateInviteLinkRequest.java`
+  - virtual-directory API request/response DTOs:
+    - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/api/*`
+- Common API error payload DTO was moved to:
+  - `src/main/java/io/github/supernoobchallenge/nasserver/global/dto/api/ErrorResponse.java`
+- Non-API/shared DTOs remain in existing `dto` package when used by service/domain logic:
+  - examples: `LoginResponse`, `CreateInviteLinkResponse`, `VirtualDirectoryTreeResponse`, `VirtualDirectoryChildResponse`
 
 ## 3. Tests Added/Updated
 
@@ -281,7 +317,7 @@ Update Policy: This file can and should be updated multiple times during the pro
 
 ## 6. Suggested Next Steps
 1. Add API layer for capacity request enqueue.
-2. Add admin recovery flow on boot as described in requirements.
+2. Define/implement strict recovery trigger-file policy on boot on top of current system-account sync/create.
 3. Update `README.md` with endpoint-level examples for user/auth/share-invite/password-reset APIs.
 4. Consider dedicated password-reset token table and production mail adapter wiring.
 
@@ -291,7 +327,7 @@ Update Policy: This file can and should be updated multiple times during the pro
    - if strict email-bound invite is required, schema/API extension is needed.
 2. Password reset token currently reuses `share_links` table (`link_type=PASSWORD_RESET`) instead of a dedicated token table.
 3. Password reset mail service default implementation is logging only (real SMTP/provider adapter pending).
-4. Admin recovery flow on boot is not implemented yet.
+4. System-account sync/create on boot is implemented, but full requirement-level recovery trigger-file flow is still pending.
 5. Batch model consistency cleanup pending:
    - status/jobType are raw strings (not enums)
    - naming drift exists between schema docs and entity field names (`retry_count` vs `attempt_count`, etc).

@@ -1,14 +1,14 @@
-package io.github.supernoobchallenge.nasserver.file.core.controller;
+package io.github.supernoobchallenge.nasserver.file.core.controller.api;
 
-import io.github.supernoobchallenge.nasserver.file.core.dto.CreateVirtualDirectoryRequest;
-import io.github.supernoobchallenge.nasserver.file.core.dto.CreateVirtualDirectoryResponse;
-import io.github.supernoobchallenge.nasserver.file.core.dto.MoveVirtualDirectoryRequest;
-import io.github.supernoobchallenge.nasserver.file.core.dto.RenameVirtualDirectoryRequest;
+import io.github.supernoobchallenge.nasserver.file.core.dto.api.CreateVirtualDirectoryRequest;
+import io.github.supernoobchallenge.nasserver.file.core.dto.api.CreateVirtualDirectoryResponse;
+import io.github.supernoobchallenge.nasserver.file.core.dto.api.MoveVirtualDirectoryRequest;
+import io.github.supernoobchallenge.nasserver.file.core.dto.api.RenameVirtualDirectoryRequest;
 import io.github.supernoobchallenge.nasserver.file.core.dto.VirtualDirectoryChildResponse;
 import io.github.supernoobchallenge.nasserver.file.core.dto.VirtualDirectoryTreeResponse;
 import io.github.supernoobchallenge.nasserver.file.core.service.VirtualDirectoryService;
+import io.github.supernoobchallenge.nasserver.global.dto.api.ErrorResponse;
 import io.github.supernoobchallenge.nasserver.global.security.AuditorAwareImpl;
-import io.github.supernoobchallenge.nasserver.user.dto.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -41,7 +41,7 @@ db.yml
 db.properties
 
 ### System
-#system.properties
+system.properties
 
 ### Reference ##
 reference/0*

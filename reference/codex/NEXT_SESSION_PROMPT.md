@@ -20,23 +20,38 @@
 - Thymeleaf 웹 화면 추가:
   - `/web/login` 로그인
   - `/web/directories` 디렉터리 트리 관리(생성/이름변경/이동/삭제요청)
+- 시스템 계정 부팅 프로비저닝 추가:
+  - `system.properties`를 로드해 `user_id=1`을 동기화/자동생성
+  - 설정 키는 `system.account.login-id/password/email`
+  - 구조는 `global/bootstrap`의 initializer + provisioning service로 분리됨
+- API/Web 패키지 경계 최신 상태:
+  - REST 컨트롤러는 `*/controller/api`에 위치
+  - API 전용 DTO는 `*/dto/api`에 위치
+  - 웹 페이지 컨트롤러는 `*/controller`에 유지
 
 ## First Steps
 1. `reference/codex/SESSION_BRIEF.md`, `reference/codex/PROJECT_HANDOFF.md`, `reference/codex/SESSION_LOG_SHORT.md`, `reference/TODO.md` 순서로 읽는다.
 2. 아래 핵심 파일을 확인한다:
-   - `src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/AuthService.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/UserController.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/PasswordResetService.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/share/controller/ShareInvitationController.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/VirtualFileRepository.java`
-   - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/repository/RealFileRepository.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/global/config/SecurityConfig.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountInitializer.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProvisioningService.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProperties.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/AuthService.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/WebAuthPageController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/AuthController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/UserController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/service/PasswordResetService.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/share/controller/api/ShareInvitationController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserRepository.java`
+  - `src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserPermissionRepository.java`
 3. 기준선 테스트를 실행한다:
    - `.\gradlew.bat test --tests "*AuthControllerIntegrationTest" --tests "*UserControllerIntegrationTest" --tests "*ShareInvitationIntegrationTest" --tests "*UserServiceIntegrationTest" --tests "*VirtualFileDeleteHandlerTest" --tests "*VirtualDirectoryDeleteHandlerTest"`
    - `.\gradlew.bat test --tests "*BatchJobWorkerCapacityIntegrationTest" --tests "*CapacityAllocationBatchIntegrationTest"`
+   - `.\gradlew.bat test --tests "*VirtualDirectoryControllerIntegrationTest" --tests "*VirtualDirectoryPageControllerIntegrationTest"`
 
 ## Priority
-1. 관리자 복구 기능(부팅 시)
+1. 관리자 복구 정책 구체화(트리거 파일 기반) 및 현재 시스템 계정 부팅 프로비저닝과 통합
 2. 용량 요청 배치 API 레이어
 3. 배치 상태/타입 enum화 및 네이밍 정합성
 4. 비밀번호 재설정 토큰 전용 테이블 + 실제 메일 발송 어댑터 연결

@@ -1,6 +1,6 @@
-package io.github.supernoobchallenge.nasserver.user.controller;
+package io.github.supernoobchallenge.nasserver.user.controller.api;
 
-import io.github.supernoobchallenge.nasserver.user.dto.LoginRequest;
+import io.github.supernoobchallenge.nasserver.user.dto.api.LoginRequest;
 import io.github.supernoobchallenge.nasserver.user.dto.LoginResponse;
 import io.github.supernoobchallenge.nasserver.user.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;

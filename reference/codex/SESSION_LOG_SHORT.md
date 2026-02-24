@@ -21,6 +21,46 @@ Format:
 
 Entries:
 
+## 2026-02-24 14:21
+- current_feature: API/Web 컨트롤러 경계를 `controller/api`로 분리하고 API 전용 DTO를 `dto/api`로 정렬
+- related_files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/WebAuthPageController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/AuthController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/controller/api/UserController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/share/controller/api/ShareInvitationController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/controller/api/VirtualDirectoryController.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/dto/api/LoginRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/share/dto/api/CreateInviteLinkRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/file/core/dto/api/CreateVirtualDirectoryRequest.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/dto/api/ErrorResponse.java
+- last_ai_work: 웹 인증 라우트(`/`, `/web/login`, `/web/logout`)를 `WebAuthPageController`로 분리하고, REST 컨트롤러를 도메인별 `controller/api`로 이동했으며 API에서만 쓰는 DTO 경로를 `dto/api`로 통일하고 import/package를 일괄 정리
+- verification: `.\gradlew.bat test --tests "*AuthControllerIntegrationTest" --tests "*UserControllerIntegrationTest" --tests "*ShareInvitationIntegrationTest" --tests "*VirtualDirectoryControllerIntegrationTest" --tests "*VirtualDirectoryPageControllerIntegrationTest"` 통과
+
+## 2026-02-23 21:42
+- current_feature: 시스템 계정 설정 키를 `system.account.*` 네임스페이스로 리팩터링
+- related_files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProperties.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountInitializer.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProvisioningService.java
+  - src/main/resources/system.properties
+  - src/test/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProvisioningServiceTest.java
+- last_ai_work: `@ConfigurationProperties` prefix를 `system.account`로 변경하고 필드명을 `id -> loginId`로 명확화했으며, 초기화 경고/예외 문구와 테스트 설정 바인딩을 모두 신규 키(`system.account.login-id/password/email`) 기준으로 정렬
+- verification: `.\gradlew.bat test --tests "*SystemAccountProvisioningServiceTest" --tests "*UserServiceTest"` 통과
+
+## 2026-02-23 21:26
+- current_feature: `system.properties` 기반 시스템 계정(`user_id=1`) 부팅 동기화/자동 생성 + bootstrap/provisioning 구조 분리
+- related_files:
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountInitializer.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProvisioningService.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProperties.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserRepository.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/repository/UserPermissionRepository.java
+  - src/main/java/io/github/supernoobchallenge/nasserver/user/entity/User.java
+  - src/main/resources/application.properties
+  - src/test/java/io/github/supernoobchallenge/nasserver/global/bootstrap/SystemAccountProvisioningServiceTest.java
+- last_ai_work: 기존 user/service 러너를 제거하고 global/bootstrap 계층으로 재구성했으며, 시스템 계정이 없으면 `users`/`user_permissions`를 강제 PK(`1`)로 생성하고 존재하면 `loginId/password`만 동기화하도록 분리 구현
+- verification: `.\gradlew.bat test --tests "*SystemAccountProvisioningServiceTest" --tests "*UserServiceTest"` 통과
+
 ## 2026-02-23 19:58
 - current_feature: 디렉터리 트리 API의 계정 인증 컨텍스트를 세션 사용자 기준으로 전환
 - related_files:

@@ -57,7 +57,7 @@ Scope: Domain-based backlog
 
 ## global
 ### P1 (High)
-- [ ] 없음
+- [ ] 관리자 복구 트리거 파일 기반 부팅 정책 구현 (현재는 `system.properties` 기반 시스템 계정 동기화/자동생성만 지원)
 
 ### P2 (Medium)
 - [ ] Thymeleaf 웹 폼 경로(`/web/**`)에 대한 CSRF 정책 확정 및 적용(재활성화 시 템플릿 토큰 반영 포함)

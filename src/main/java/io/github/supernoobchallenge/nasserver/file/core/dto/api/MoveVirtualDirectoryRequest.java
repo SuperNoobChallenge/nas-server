@@ -1,4 +1,4 @@
-package io.github.supernoobchallenge.nasserver.file.core.dto;
+package io.github.supernoobchallenge.nasserver.file.core.dto.api;
 
 public record MoveVirtualDirectoryRequest(Long newParentDirectoryId) {
 }

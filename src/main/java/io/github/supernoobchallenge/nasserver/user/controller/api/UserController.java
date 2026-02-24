@@ -1,12 +1,12 @@
-package io.github.supernoobchallenge.nasserver.user.controller;
+package io.github.supernoobchallenge.nasserver.user.controller.api;
 
-import io.github.supernoobchallenge.nasserver.user.dto.ChangePasswordRequest;
-import io.github.supernoobchallenge.nasserver.user.dto.ErrorResponse;
-import io.github.supernoobchallenge.nasserver.user.dto.InviteRegisterRequest;
-import io.github.supernoobchallenge.nasserver.user.dto.InviteRegisterResponse;
-import io.github.supernoobchallenge.nasserver.user.dto.PasswordResetConfirmRequest;
-import io.github.supernoobchallenge.nasserver.user.dto.PasswordResetRequest;
+import io.github.supernoobchallenge.nasserver.global.dto.api.ErrorResponse;
 import io.github.supernoobchallenge.nasserver.share.service.ShareInvitationService;
+import io.github.supernoobchallenge.nasserver.user.dto.api.ChangePasswordRequest;
+import io.github.supernoobchallenge.nasserver.user.dto.api.InviteRegisterRequest;
+import io.github.supernoobchallenge.nasserver.user.dto.api.InviteRegisterResponse;
+import io.github.supernoobchallenge.nasserver.user.dto.api.PasswordResetConfirmRequest;
+import io.github.supernoobchallenge.nasserver.user.dto.api.PasswordResetRequest;
 import io.github.supernoobchallenge.nasserver.user.service.PasswordResetService;
 import io.github.supernoobchallenge.nasserver.user.service.UserService;
 import lombok.RequiredArgsConstructor;
