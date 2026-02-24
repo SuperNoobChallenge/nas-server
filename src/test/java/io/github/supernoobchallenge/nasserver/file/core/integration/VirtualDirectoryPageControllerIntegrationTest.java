@@ -53,7 +53,7 @@ class VirtualDirectoryPageControllerIntegrationTest {
     @Test
     @DisplayName("로그인 페이지는 비로그인 상태에서 접근 가능하다")
     void loginPage_WithoutLogin_ReturnsOk() throws Exception {
-        mockMvc.perform(get("/web/login"))
+        mockMvc.perform(get("/login"))
                 .andExpect(status().isOk());
     }
 
@@ -62,11 +62,11 @@ class VirtualDirectoryPageControllerIntegrationTest {
     void webLogin_WithValidUser_RedirectsToDirectories() throws Exception {
         userService.register("web_user_1", "pass-1234", "web_user_1@test.com");
 
-        mockMvc.perform(post("/web/login")
+        mockMvc.perform(post("/login")
                         .param("loginId", "web_user_1")
                         .param("password", "pass-1234"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/web/directories"));
+                .andExpect(redirectedUrl("/directories"));
     }
 
     @Test
@@ -75,13 +75,13 @@ class VirtualDirectoryPageControllerIntegrationTest {
         Long userId = userService.register("web_user_2", "pass-1234", "web_user_2@test.com");
         MockHttpSession session = loginViaWeb("web_user_2", "pass-1234");
 
-        mockMvc.perform(post("/web/directories/create")
+        mockMvc.perform(post("/directories/create")
                         .session(session)
                         .param("name", "web-root")
                         .param("readLevel", "0")
                         .param("writeLevel", "1"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/web/directories"));
+                .andExpect(redirectedUrl("/directories"));
 
         User user = userRepository.findById(userId).orElseThrow();
         assertThat(virtualDirectoryRepository.findActiveChildren(user.getFilePermission().getId(), null))
@@ -90,7 +90,7 @@ class VirtualDirectoryPageControllerIntegrationTest {
     }
 
     private MockHttpSession loginViaWeb(String loginId, String password) throws Exception {
-        MvcResult result = mockMvc.perform(post("/web/login")
+        MvcResult result = mockMvc.perform(post("/login")
                         .param("loginId", loginId)
                         .param("password", password))
                 .andExpect(status().is3xxRedirection())

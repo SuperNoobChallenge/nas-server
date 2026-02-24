@@ -19,19 +19,19 @@ public class WebAuthPageController {
     @GetMapping("/")
     public String home() {
         return auditorAware.getAuthenticatedAuditor().isPresent()
-                ? "redirect:/web/directories"
-                : "redirect:/web/login";
+                ? "redirect:/directories"
+                : "redirect:/login";
     }
 
-    @GetMapping("/web/login")
+    @GetMapping("/login")
     public String loginPage() {
         if (auditorAware.getAuthenticatedAuditor().isPresent()) {
-            return "redirect:/web/directories";
+            return "redirect:/directories";
         }
         return "web/login";
     }
 
-    @PostMapping("/web/login")
+    @PostMapping("/login")
     public String login(
             @RequestParam String loginId,
             @RequestParam String password,
@@ -40,16 +40,16 @@ public class WebAuthPageController {
     ) {
         try {
             authService.login(loginId, password, request);
-            return "redirect:/web/directories";
+            return "redirect:/directories";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/web/login";
+            return "redirect:/login";
         }
     }
 
-    @PostMapping("/web/logout")
+    @PostMapping("/logout")
     public String logout(HttpServletRequest request) {
         authService.logout(request);
-        return "redirect:/web/login";
+        return "redirect:/login";
     }
 }

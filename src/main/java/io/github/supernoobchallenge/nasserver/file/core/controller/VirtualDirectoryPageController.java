@@ -17,7 +17,7 @@ public class VirtualDirectoryPageController {
     private final VirtualDirectoryService virtualDirectoryService;
     private final AuditorAwareImpl auditorAware;
 
-    @GetMapping("/web/directories")
+    @GetMapping("/directories")
     public String directoryPage(Model model) {
         Long requesterUserId = getRequesterUserId();
         model.addAttribute("directoryTree", virtualDirectoryService.listDirectoryTree(requesterUserId));
@@ -25,7 +25,7 @@ public class VirtualDirectoryPageController {
         return "web/directories";
     }
 
-    @PostMapping("/web/directories/create")
+    @PostMapping("/directories/create")
     public String createDirectory(
             @RequestParam(required = false) Long parentDirectoryId,
             @RequestParam String name,
@@ -45,10 +45,10 @@ public class VirtualDirectoryPageController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/web/directories";
+        return "redirect:/directories";
     }
 
-    @PostMapping("/web/directories/{directoryId}/rename")
+    @PostMapping("/directories/{directoryId}/rename")
     public String renameDirectory(
             @PathVariable Long directoryId,
             @RequestParam String name,
@@ -60,10 +60,10 @@ public class VirtualDirectoryPageController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/web/directories";
+        return "redirect:/directories";
     }
 
-    @PostMapping("/web/directories/{directoryId}/move")
+    @PostMapping("/directories/{directoryId}/move")
     public String moveDirectory(
             @PathVariable Long directoryId,
             @RequestParam(required = false) Long newParentDirectoryId,
@@ -75,10 +75,10 @@ public class VirtualDirectoryPageController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/web/directories";
+        return "redirect:/directories";
     }
 
-    @PostMapping("/web/directories/{directoryId}/delete")
+    @PostMapping("/directories/{directoryId}/delete")
     public String deleteDirectory(@PathVariable Long directoryId, RedirectAttributes redirectAttributes) {
         try {
             virtualDirectoryService.requestDeleteDirectory(getRequesterUserId(), directoryId);
@@ -86,7 +86,7 @@ public class VirtualDirectoryPageController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/web/directories";
+        return "redirect:/directories";
     }
 
     private Long getRequesterUserId() {
